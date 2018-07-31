@@ -1,0 +1,35 @@
+{
+        "projects": [
+                {
+                        "name": "liblexer",
+                        "kind": "StaticLib",
+
+                        "files": [
+                                "./include/**.h",
+                                "./src/**.c",
+                                "./src/**.h"
+                        ],
+
+                        "include_dir_public": [
+                                "./include/"
+                        ],
+
+                        "depends_on": [
+                                "libfundamental"
+                        ]
+                },
+                {
+                        "name": "expr_lex",
+                        "kind": "ConsoleApp",
+
+                        "files": [
+                                "./standalone/**.h",
+                                "./standalone/**.c"
+                        ],
+
+                        "depends_on": [
+                                "liblexer"
+                        ]
+                }
+        ]
+}

@@ -1,0 +1,18 @@
+{
+        "projects": [
+                {
+                        "name": "libfundamental",
+                        "kind": "StaticLib",
+
+                        "files": [
+                                "./include/**.h",
+                                "./src/**.c",
+                                "./src/**.h"
+                        ],
+
+                        "include_dir_public": [
+                                "./include/"
+                        ]
+                }
+        ]
+}
