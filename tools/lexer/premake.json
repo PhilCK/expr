@@ -1,0 +1,35 @@
+{
+        "projects": [
+                {
+                        "name": "lexer",
+                        "kind": "StaticLib",
+
+                        "files": [
+                                "./include/**.h",
+                                "./src/**.c",
+                                "./src/**.h"
+                        ],
+
+                        "include_dirs_public": [
+                                "./include/"
+                        ],
+
+                        "dependencies": [
+                                "fundamental"
+                        ]
+                },
+                {
+                        "name": "expr_lex",
+                        "kind": "ConsoleApp",
+
+                        "files": [
+                                "./standalone/**.h",
+                                "./standalone/**.c"
+                        ],
+
+                        "dependencies": [
+                                "lexer"
+                        ]
+                }
+        ]
+}
