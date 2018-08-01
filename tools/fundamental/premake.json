@@ -1,7 +1,7 @@
 {
         "projects": [
                 {
-                        "name": "libfundamental",
+                        "name": "fundamental",
                         "kind": "StaticLib",
 
                         "files": [
@@ -10,7 +10,7 @@
                                 "./src/**.h"
                         ],
 
-                        "include_dir_public": [
+                        "include_dirs_public": [
                                 "./include/"
                         ]
                 }

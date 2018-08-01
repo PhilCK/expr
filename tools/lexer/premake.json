@@ -1,7 +1,7 @@
 {
         "projects": [
                 {
-                        "name": "liblexer",
+                        "name": "lexer",
                         "kind": "StaticLib",
 
                         "files": [
@@ -10,12 +10,12 @@
                                 "./src/**.h"
                         ],
 
-                        "include_dir_public": [
+                        "include_dirs_public": [
                                 "./include/"
                         ],
 
-                        "depends_on": [
-                                "libfundamental"
+                        "dependencies": [
+                                "fundamental"
                         ]
                 },
                 {
@@ -27,8 +27,8 @@
                                 "./standalone/**.c"
                         ],
 
-                        "depends_on": [
-                                "liblexer"
+                        "dependencies": [
+                                "lexer"
                         ]
                 }
         ]

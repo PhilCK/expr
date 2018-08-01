@@ -1,5 +1,7 @@
 #include <expr/lexer.h>
 #include <expr/fundamental.h>
+#include <expr/v_array.h>
+#include <string.h>
 
 
 /* ----------------------------------------------------------- [ Helpers ] -- */
@@ -70,10 +72,6 @@ parse_punct(
 }
 
 
-static int
-parse_puntuation
-
-
 /* --------------------------------------------------------- [ Interface ] -- */
 
 
@@ -87,7 +85,7 @@ expr_lexer_create(
         int puntuation_len)
 {
         /* variables */
-        struct expr_token *token = EXPR_VARR_CREATE(100000);
+        struct expr_token *token = 0; 
 
         parser_fn parsers[] = {
                 parse_num_literal,
@@ -96,6 +94,7 @@ expr_lexer_create(
                 parse_flt_literal,
                 parse_str_literal,
                 parse_ident,
+                0
         };
 
         /* check good state */
@@ -111,11 +110,13 @@ expr_lexer_create(
         while(src) {
                 int i;
                 int consume = 0;
-                int parser_count = EXPR_ARR_COUNT(parsers);
 
-                for(i = 0; i < parser_count; ++i) {
-                        consume = parsers(token, src);
-                };
+                parser_fn *par_fn = parsers;
+
+                while(par_fn) {
+                        consume = (*par_fn)(token, src);
+                        par_fn += 1;
+                }
 
                 if(consume == 0) {
                         parse_punt(token, src);
@@ -124,7 +125,6 @@ expr_lexer_create(
                 src += EXPR_MAX(1, consume);
 
                 /* new token */
-                EXPR_ARR_PUSH(token);
         }
 
         return token;
