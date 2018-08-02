@@ -1,6 +1,7 @@
 /build*
 /Build*
 premake5
+premake5.exe
 
 
 *.swp
