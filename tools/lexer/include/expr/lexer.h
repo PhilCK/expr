@@ -1,5 +1,5 @@
-#ifndef LEXER_INCLUDED
-#define LEXER_INCLUDED
+#ifndef LEXER_INCLUDED_
+#define LEXER_INCLUDED_
 
 
 enum expr_token_id {
@@ -9,19 +9,18 @@ enum expr_token_id {
         TOKID_BIN_LIT,
         TOKID_FLT_LIT,
         TOKID_STR_LIT,
+        TOKID_WHITESPACE,
         TOKID_IDENT,
         TOKID_PUNT,
 };
 
 
 struct expr_token {
-        int token_id;
-        int token_sub_id;
+        int id;
+        int sub_id;
 
-        const char *src;
-        int len;
-
-        struct expr_token *next;
+        int src_offset;
+        int src_len;
 };
 
 

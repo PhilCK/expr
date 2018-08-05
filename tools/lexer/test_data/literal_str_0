@@ -1,0 +1,4 @@
+"simple_literal_1"
+'simple_literal_2'
+"literal with embedded 'single quote' inside"
+'literal with embedded "double quote" inside'

@@ -54,7 +54,9 @@ process_args(int argc, char **argv)
 int
 main(int argc, char **argv)
 {
+        printf("foifo\n");
         /* arguments */ 
+        /*
         int i = process_args(argc, argv);
         if(i == 0) {
                 printf("Failed processing args\n");
@@ -62,7 +64,25 @@ main(int argc, char **argv)
         }
 
         printf("%d %s %s\n", argc, mapping_file, input_file);
-
         printf("Expr Lexer\n");
+        */
+
+        const char *src = "123 \"456\"\t'789' hello789 world 0xFF00FF, 1.234";
+        printf("start\n");
+
+        struct expr_token *toks = expr_lexer_create(src, 0, 0);
+        struct expr_token *tok = &toks[0];
+
+        while(tok->id != TOKID_NULL) {
+                printf("tok: (%d|%d) - [%.*s]\n",
+                    tok->id,
+                    tok->sub_id,
+                    tok->src_len,
+                    &src[tok->src_offset]);
+                tok += 1;
+        }
+
+        printf("end\n");
+
         return 0;
 }
