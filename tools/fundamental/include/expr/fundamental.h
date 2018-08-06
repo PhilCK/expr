@@ -5,7 +5,8 @@
 /* ------------------------------------------------------------- [ Array ] -- */
 
 
-#define EXPR_ARR_COUNT(arr) (sizeof(arr) / sizeof(arr[0]))
+#define EX_ARR_COUNT(arr) (sizeof(arr) / sizeof(arr[0]))
+#define EX_ARR_DATA(arr) &arr[0]
 
 
 /* ----------------------------------------------------------- [ Min Max ] -- */

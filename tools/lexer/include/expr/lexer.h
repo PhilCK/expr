@@ -5,14 +5,28 @@
 enum expr_token_id {
         TOKID_NULL,
         TOKID_UNKNOWN,
-        TOKID_NUM_LIT,
-        TOKID_HEX_LIT,
-        TOKID_BIN_LIT,
-        TOKID_FLT_LIT,
-        TOKID_STR_LIT,
+        TOKID_LITERAL,
         TOKID_WHITESPACE,
         TOKID_IDENT,
         TOKID_PUNCT,
+
+        /* whitespace sub ids */
+        TOKID_WS_SPACE,
+        TOKID_WS_TAB,
+        TOKID_IS_NEWLINE,
+
+        /* literal sub ids */
+        TOKID_LIT_NUM,
+        TOKID_LIT_HEX,
+        TOKID_LIT_BIN,
+        TOKID_LIT_FLT,
+        TOKID_LIT_STR,
+};
+
+
+enum expr_type_id {
+        EX_LEX_TYPEID_NULL,
+        EX_LEX_TYPEID_CREATE,
 };
 
 
@@ -31,11 +45,21 @@ struct expr_sub_punctuation {
 };
 
 
+struct expr_lexer_create_desc {
+        int type_id;
+        void *ext;
+
+        const char *src;
+        struct expr_sub_punctuation *punctuation;
+        int punctuation_count;
+
+        int skip_whitespace;
+};
+
+
 struct expr_token*
 expr_lexer_create(
-        const char *src,
-        struct expr_sub_punctuation *punctuation,
-        int punctuation_len);
+        struct expr_lexer_create_desc *desc);
 
 
 void

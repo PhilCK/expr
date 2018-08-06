@@ -114,9 +114,11 @@ parse_num_literal(
         
         len = end - src;
 
-        if(len) {
-                set_token(next, TOKID_NUM_LIT, 0, 0, len);
+        if(!len) {
+                return 0;
         }
+        
+        set_token(next, TOKID_LITERAL, TOKID_LIT_NUM, 0, len);
 
         return len;
 }
@@ -153,9 +155,11 @@ parse_hex_literal(
 
         len = end - src;
 
-        if(len) {
-                set_token(next, TOKID_HEX_LIT, 0, 0, len);
+        if(!len) {
+                return 0;
         }
+        
+        set_token(next, TOKID_LITERAL, TOKID_LIT_HEX, 0, len);
 
         return len;
 }
@@ -173,12 +177,14 @@ parse_flt_literal(
         assert(next);
         assert(src);
 
+        /* floats have to start with a number */
         if (!is_numeric(*src)) {
                 return 0;
         }
 
         end += 1;
-        
+       
+        /* must be numbers and a single decimal */ 
         while(is_numeric(*end) || contains(*end, flt)) {
                 if(contains(*end, flt)) {
                         decimal += 1;
@@ -193,12 +199,11 @@ parse_flt_literal(
         
         len = end - src;
 
-        if(len) {
-                set_token(next, TOKID_NUM_LIT, 0, 0, len);
+        if(!len) {
+                return 0;
         }
 
-        return len;
-
+        set_token(next, TOKID_LITERAL, TOKID_LIT_FLT, 0, len);
 
         return len;
 }
@@ -231,9 +236,11 @@ parse_str_literal(
 
         len = end - src;
 
-        if(len) {
-                set_token(next, TOKID_STR_LIT, 0, 0, len);
+        if(!len) {
+                return 0;
         }
+        
+        set_token(next, TOKID_LITERAL, TOKID_LIT_STR, 0, len);
 
         return len;
 }
@@ -264,9 +271,11 @@ parse_ident(
 
         len = end - src;
 
-        if(len) {
-                set_token(next, TOKID_IDENT, 0, 0, len);
+        if(!len) {
+                return 0;
         }
+        
+        set_token(next, TOKID_IDENT, 0, 0, len);
 
         return len;
 }
@@ -348,29 +357,32 @@ typedef int(*parser_fn)(struct expr_token *, const char *);
 
 struct expr_token*
 expr_lexer_create(
-        const char *src,
-        struct expr_sub_punctuation *punctuation,
-        int punctuation_len)
+        struct expr_lexer_create_desc *desc)
 {
         /* variables */
         struct expr_token *start_token = calloc(sizeof(*start_token) * 1000, 1);
         struct expr_token *token = &start_token[0];
-        const char *start = src;
+        const char *start = 0;
+        const char *src = 0;
 
         parser_fn parsers[] = {
                 parse_hex_literal,
                 parse_flt_literal,
                 parse_num_literal,
                 parse_str_literal,
-                parse_whitespace,
                 parse_ident,
+                parse_whitespace,
                 0 
         };
 
         /* check good state */
-        assert(src);
-        assert(strlen(src));
+        assert(desc);
+        assert(desc->src);
+        assert(strlen(desc->src));
 
+        start = desc->src;
+        src = start;
+        
         /* param fail */
         if(!src || !strlen(src)) {
                 return 0;
@@ -378,8 +390,9 @@ expr_lexer_create(
 
         /* loop through characters */
         while(*src) {
+                set_token(token, TOKID_NULL, 0, 0, 0);      
+
                 int consume = 0;
-                printf("new token\n");
 
                 parser_fn *par_fn = &parsers[0];
 
@@ -397,8 +410,8 @@ expr_lexer_create(
                         consume = parse_punct(
                                 token,
                                 src,
-                                punctuation,
-                                punctuation_len);
+                                desc->punctuation,
+                                desc->punctuation_count);
                 }
 
                 if(consume == 0) {
@@ -408,6 +421,10 @@ expr_lexer_create(
                 assert(consume > 0);
 
                 token->src_offset = src - start;
+
+                if(desc->skip_whitespace && token->id == TOKID_WHITESPACE) {
+                        token -= 1;
+                }
 
                 token += 1;
                 src += consume;

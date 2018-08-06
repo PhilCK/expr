@@ -1,0 +1,22 @@
+
+#include "foobar"
+#include <stdio.h>
+
+
+void
+hello(int i) {
+        if(i == 123 || i == 456) {
+                printf("%d", i);
+        }
+}
+
+
+int
+main(int argc, char ** argv) {
+
+        if(1 && 1) {
+                hello(123);
+        }
+
+        return 0;
+};
