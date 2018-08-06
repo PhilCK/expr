@@ -332,13 +332,13 @@ for i, proj in ipairs(projects) do
     end
 
     if lang_table[proj.language] then
-        proj.language = lang_table[proj.language]["lang"];
-
         if os.target() == "macosx" or os.target() == "linux" then
             table.insert(
                 proj.buildoptions,
                 lang_table[proj.language]["gnu"]);
         end
+
+        proj.language = lang_table[proj.language]["lang"];
     end
 
 end

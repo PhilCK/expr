@@ -4,6 +4,7 @@
 
 enum expr_token_id {
         TOKID_NULL,
+        TOKID_UNKNOWN,
         TOKID_NUM_LIT,
         TOKID_HEX_LIT,
         TOKID_BIN_LIT,
@@ -11,7 +12,7 @@ enum expr_token_id {
         TOKID_STR_LIT,
         TOKID_WHITESPACE,
         TOKID_IDENT,
-        TOKID_PUNT,
+        TOKID_PUNCT,
 };
 
 
@@ -24,7 +25,7 @@ struct expr_token {
 };
 
 
-struct expr_sub_puntuation {
+struct expr_sub_punctuation {
         const char *pattern;
         int token_sub_id;
 };
@@ -33,8 +34,8 @@ struct expr_sub_puntuation {
 struct expr_token*
 expr_lexer_create(
         const char *src,
-        struct expr_sub_puntuation *puntuation,
-        int puntuation_len);
+        struct expr_sub_punctuation *punctuation,
+        int punctuation_len);
 
 
 void

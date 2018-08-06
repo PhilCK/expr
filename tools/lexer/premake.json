@@ -3,6 +3,7 @@
                 {
                         "name": "lexer",
                         "kind": "StaticLib",
+                        "language": "C-ANSI",
 
                         "files": [
                                 "./include/**.h",

@@ -67,10 +67,15 @@ main(int argc, char **argv)
         printf("Expr Lexer\n");
         */
 
-        const char *src = "123 \"456\"\t'789' hello789 world 0xFF00FF, 1.234";
+        const char *src = "123 && || \"456\"\t'789'    hello789 world 0XFF 0xFF00FF, 1.234 1.234f 'nested\"somethign\"' \"more'nested'things\"";
         printf("start\n");
 
-        struct expr_token *toks = expr_lexer_create(src, 0, 0);
+        struct expr_sub_punctuation punct[] = {
+                {"&&", 1},
+                {"||", 2},
+        };
+
+        struct expr_token *toks = expr_lexer_create(src, &punct[0], 2);
         struct expr_token *tok = &toks[0];
 
         while(tok->id != TOKID_NULL) {

@@ -10,19 +10,33 @@
 /* ------------------------------------------------------------ [ Tables ] -- */
 
 
-const char  whitespace[] = {
+static const char  whitespace[] = {
         ' ', '\t', '\n', '\r',
         '\0'
 };
 
 
-const char numeric[] = {
+static const char numeric[] = {
         '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
         '\0'
 };
 
 
-const char alpha[] = {
+static const char hex[] = {
+        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+        'a', 'b', 'c', 'd', 'e', 'f',
+        'A', 'B', 'C', 'D', 'E', 'F',
+        '\0'
+};
+
+
+static const char flt[] = {
+        '.',
+        '\0'
+};
+
+
+static const char alpha[] = {
         'a', 'A', 'b', 'B', 'c', 'C', 'd', 'D', 'e', 'E', 'f', 'F', 'g', 'G',
         'h', 'H', 'i', 'I', 'j', 'J', 'k', 'K', 'l', 'L', 'm', 'M', 'n', 'N',
         'o', 'O', 'p', 'P', 'q', 'Q', 'r', 'R', 's', 'S', 't', 'T', 'u', 'U',
@@ -31,7 +45,7 @@ const char alpha[] = {
 };
 
 
-const char str_literal[] = {
+static const char str_literal[] = {
         '\'', '\"',
         '\0'
 };
@@ -62,6 +76,7 @@ static int is_alpha(char c)         { return contains(c, alpha);            }
 static int is_numeric(char c)       { return contains(c, numeric);          }
 static int is_alpha_numeric(char c) { return is_alpha(c) || is_numeric(c);  }
 static int is_str_literal(char c)   { return contains(c, str_literal);      }
+static int is_hex(char c)           { return contains(c, hex);              }
 
 
 void
@@ -93,15 +108,10 @@ parse_num_literal(
 
         end += 1;
         
-        while (!is_whitespace(*end)) {
-                if (is_numeric(*end)) {
-                        end += 1;
-                }
-                else {
-                        break;
-                }
+        while(is_numeric(*end)) {
+                end += 1;
         }
-
+        
         len = end - src;
 
         if(len) {
@@ -117,12 +127,37 @@ parse_hex_literal(
         struct expr_token *next,
         const char *src)
 {
-        const char *start = src;
+        const char *end = src;
+        int len;
 
         assert(next);
         assert(src);
 
-        return 0;
+        /* check starts with 0x or 0X */
+        if (*end != '0') {
+                return 0;
+        }
+
+        end += 1;
+        
+        if(!(*end == 'x' || *end == 'X')) {
+                return 0;
+        }
+
+        end += 1;
+
+        /* find all hex values */
+        while(is_hex(*end)) {
+                end += 1;
+        }
+
+        len = end - src;
+
+        if(len) {
+                set_token(next, TOKID_HEX_LIT, 0, 0, len);
+        }
+
+        return len;
 }
 
 
@@ -131,7 +166,41 @@ parse_flt_literal(
         struct expr_token *next,
         const char *src)
 {
-        return 0;
+        const char *end = src;
+        int len;
+        int decimal = 0;        
+
+        assert(next);
+        assert(src);
+
+        if (!is_numeric(*src)) {
+                return 0;
+        }
+
+        end += 1;
+        
+        while(is_numeric(*end) || contains(*end, flt)) {
+                if(contains(*end, flt)) {
+                        decimal += 1;
+
+                        if(decimal > 1) {
+                                return 0;
+                        }
+                }
+
+                end += 1;
+        }
+        
+        len = end - src;
+
+        if(len) {
+                set_token(next, TOKID_NUM_LIT, 0, 0, len);
+        }
+
+        return len;
+
+
+        return len;
 }
 
 
@@ -146,14 +215,15 @@ parse_str_literal(
         assert(next);
         assert(src);
 
+        /* check starts with literal */
         if (!is_str_literal(*src)) {
                 return 0;
         }
         
         end += 1;
 
+        /* continue until we find matching literal */
         while (*end != *src) {
-                printf(". %c\n", *end);
                 end += 1;
         }
 
@@ -180,12 +250,14 @@ parse_ident(
         assert(next);
         assert(src);
 
+        /* idents can't start with a number */
         if(!is_alpha(*end)) {
                 return 0;
         }
        
         end += 1;
 
+        /* continue with all alpha numeric */
         while (is_alpha_numeric(*end)) {
                 end += 1;
         }
@@ -205,6 +277,10 @@ parse_unknown(
         struct expr_token *next,
         const char *src)
 {
+        (void)next;
+        (void)src;
+
+        set_token(next, TOKID_UNKNOWN, 0, 0, 1);
         return 1;
 }
 
@@ -231,11 +307,7 @@ parse_whitespace(
         len = end - src;
 
         if(len) {
-                printf("whitespace\n");
-                next->id         = TOKID_WHITESPACE;
-                next->sub_id     = TOKID_NULL;
-                next->src_offset = 0;
-                next->src_len    = len;
+                set_token(next, TOKID_WHITESPACE, 0, 0, len);      
         }
 
         return len;
@@ -246,9 +318,24 @@ static int
 parse_punct(
         struct expr_token *next,
         const char *src,
-        struct expr_sub_puntuation *sub_punt,
-        int sub_punt_len)
+        struct expr_sub_punctuation *sub_punct,
+        int sub_punct_len)
 {
+        int i;
+
+        for(i = 0; i < sub_punct_len; ++i) {
+                int pat_len = strlen(sub_punct[i].pattern);
+                int cmp = strncmp(src, sub_punct[i].pattern, pat_len);
+
+                if(cmp == 0) {
+                        int sub_id = sub_punct[i].token_sub_id;
+                        set_token(next, TOKID_PUNCT, sub_id, 0, pat_len);
+
+                        return pat_len;
+                }
+        }
+
+
         return 0;
 }
 
@@ -262,8 +349,8 @@ typedef int(*parser_fn)(struct expr_token *, const char *);
 struct expr_token*
 expr_lexer_create(
         const char *src,
-        struct expr_sub_puntuation *puntuation,
-        int puntuation_len)
+        struct expr_sub_punctuation *punctuation,
+        int punctuation_len)
 {
         /* variables */
         struct expr_token *start_token = calloc(sizeof(*start_token) * 1000, 1);
@@ -310,8 +397,8 @@ expr_lexer_create(
                         consume = parse_punct(
                                 token,
                                 src,
-                                puntuation,
-                                puntuation_len);
+                                punctuation,
+                                punctuation_len);
                 }
 
                 if(consume == 0) {
