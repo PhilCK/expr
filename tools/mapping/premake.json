@@ -1,0 +1,37 @@
+{
+        "projects": [
+                {
+                        "name": "mapping",
+                        "kind": "StaticLib",
+                        "language": "C-ANSI",
+
+                        "files": [
+                                "./include/**.h",
+                                "./src/**.c",
+                                "./src/**.h"
+                        ],
+
+                        "include_dirs_public": [
+                                "./include/"
+                        ],
+
+                        "dependencies": [
+                                "fundamental",
+                                "lexer"
+                        ]
+                },
+                {
+                        "name": "expr_map",
+                        "kind": "ConsoleApp",
+
+                        "files": [
+                                "./standalone/**.h",
+                                "./standalone/**.c"
+                        ],
+
+                        "dependencies": [
+                                "mapping"
+                        ]
+                }
+        ]
+}

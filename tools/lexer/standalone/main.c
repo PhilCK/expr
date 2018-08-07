@@ -130,6 +130,7 @@ main(int argc, char **argv)
                 unsigned i;
                 for(i = 0; i < line_count; ++i) {
                         expr_sub_punct[i].pattern = mapping_src;
+                        expr_sub_punct[i].token_sub_id = i;
 
                         while(*mapping_src != '\n') {
                                 mapping_src += 1;
@@ -141,7 +142,7 @@ main(int argc, char **argv)
                         printf("%s\n", expr_sub_punct[i].pattern);
                 }
         }
-        
+         
         /* create tokens setup  */ 
         struct expr_lexer_create_desc lex_desc;
         lex_desc.type_id           = EX_LEX_TYPEID_CREATE;
