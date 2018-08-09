@@ -41,6 +41,7 @@ static const char alpha[] = {
         'h', 'H', 'i', 'I', 'j', 'J', 'k', 'K', 'l', 'L', 'm', 'M', 'n', 'N',
         'o', 'O', 'p', 'P', 'q', 'Q', 'r', 'R', 's', 'S', 't', 'T', 'u', 'U',
         'v', 'V', 'w', 'W', 'x', 'X', 'y', 'Y', 'z', 'Z',
+        '-', '_',
         '\0'
 };
 
@@ -423,6 +424,7 @@ expr_lexer_create(
                 token->src_offset = src - start;
 
                 if(desc->skip_whitespace && token->id == TOKID_WHITESPACE) {
+                        set_token(token, TOKID_NULL, 0, 0, 0);      
                         token -= 1;
                 }
 

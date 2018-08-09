@@ -9,9 +9,23 @@
 
 const char *mapping_file = 0;
 const char *input_file = 0;
+const char *output_file = 0;
+int output_stream = 0;
 
 
-/* ---------------------------------------------------------- [ Internal ] -- */
+/* ------------------------------------------------------- [ Arg Helpers ] -- */
+
+
+void
+print_help()
+{
+        printf("usage: expr_lex <input_filename> <options>\n\n");
+        printf("options:\n");
+        printf("-m <filepath>  -file that contains a list of punctuation\n");
+        printf("-o <filename>  -outputs the token stream to a file\n");
+        printf("-os            -outputs the token stream to stdout\n");
+        printf("-h             -outputs this dialog\n");
+}
 
 
 int
@@ -25,11 +39,34 @@ process_args(int argc, char **argv)
                 /* mapping */
                 if(strcmp(argv[i], "-m") == 0) {
                         if(argc <  i + 1) {
-                                printf("Missing Arg\n");
+                                printf("Missing mapping filename\n");
                                 return 0;
                         }
                         
                         mapping_file = argv[i + 1];
+                        ++i;
+                }
+
+                /* output file */
+                else if(strcmp(argv[i], "-o") == 0) {
+                        if(argc < i + 1) {
+                                printf("Missing output filename\n");
+                                return 0;
+                        }
+
+                        output_file = argv[i + 1];
+                        ++i;
+                }
+
+                /* output */
+                else if(strcmp(argv[i], "-os") == 0) {
+                        output_stream = 1;
+                        ++i;
+                }
+
+                /* help */
+                else if(strcmp(argv[i], "-h") == 0) {
+                        print_help();
                         ++i;
                 }
 
@@ -46,6 +83,9 @@ process_args(int argc, char **argv)
 
        return !!input_file; 
 }
+
+
+/* ----------------------------------------------------------- [ Helpers ] -- */
 
 
 unsigned
@@ -92,6 +132,11 @@ main(int argc, char **argv)
                 return 1;
         }
 
+        if(output_stream == 0 && output_file == 0) {
+                printf("No output. See -h for more info\n");
+                return 1;
+        }
+
         printf("%d %s %s\n", argc, mapping_file, input_file);
         printf("Expr Lexer\n");
 
@@ -114,6 +159,7 @@ main(int argc, char **argv)
                 const char *lines = mapping_src;
                 int line_count = 0;
 
+                /* todo - need to scan other endlines */
                 while(*lines) {
                         if(*lines == '\n') {
                                 line_count += 1;
@@ -127,7 +173,7 @@ main(int argc, char **argv)
                 expr_sub_punct = malloc(sizeof(*expr_sub_punct) * line_count);
                 lines = mapping_src;
 
-                unsigned i;
+                int i;
                 for(i = 0; i < line_count; ++i) {
                         expr_sub_punct[i].pattern = mapping_src;
                         expr_sub_punct[i].token_sub_id = i;
@@ -138,8 +184,6 @@ main(int argc, char **argv)
 
                         *((char*)mapping_src) = '\0';
                         mapping_src += 1;
-
-                        printf("%s\n", expr_sub_punct[i].pattern);
                 }
         }
          
@@ -153,15 +197,34 @@ main(int argc, char **argv)
         lex_desc.skip_whitespace   = 1;
 
         struct expr_token *toks = expr_lexer_create(&lex_desc);
-        struct expr_token *tok = &toks[0];
+        struct expr_token *tok  = &toks[0];
 
-        while(tok->id != TOKID_NULL) {
-                printf("tok: (%d|%d) - [%.*s]\n",
-                    tok->id,
-                    tok->sub_id,
-                    tok->src_len,
-                    &src[tok->src_offset]);
-                tok += 1;
+        /* output the stream on the console */
+        if(output_stream) {
+                while(tok->id != TOKID_NULL) {
+                        printf("tok: (%d|%d) - [%.*s]\n",
+                            tok->id,
+                            tok->sub_id,
+                            tok->src_len,
+                            &src[tok->src_offset]);
+                        tok += 1;
+                }
+        }
+
+        if(output_file) {
+                FILE *file = 0;
+                file = fopen(output_file, "w");
+                tok = &toks[0];
+
+                if(file) {
+                        while(tok->id != TOKID_NULL) {
+                                /* todo write file format */
+                                printf("need interweb as reference");
+                        }
+
+                        fclose(file);
+                }
+
         }
 
         printf("end\n");
