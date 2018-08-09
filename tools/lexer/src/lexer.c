@@ -119,7 +119,7 @@ parse_num_literal(
                 return 0;
         }
         
-        set_token(next, TOKID_LITERAL, TOKID_LIT_NUM, 0, len);
+        set_token(next, EX_TOKID_LITERAL, EX_TOKID_LIT_NUM, 0, len);
 
         return len;
 }
@@ -160,7 +160,7 @@ parse_hex_literal(
                 return 0;
         }
         
-        set_token(next, TOKID_LITERAL, TOKID_LIT_HEX, 0, len);
+        set_token(next, EX_TOKID_LITERAL, EX_TOKID_LIT_HEX, 0, len);
 
         return len;
 }
@@ -204,7 +204,7 @@ parse_flt_literal(
                 return 0;
         }
 
-        set_token(next, TOKID_LITERAL, TOKID_LIT_FLT, 0, len);
+        set_token(next, EX_TOKID_LITERAL, EX_TOKID_LIT_FLT, 0, len);
 
         return len;
 }
@@ -241,7 +241,7 @@ parse_str_literal(
                 return 0;
         }
         
-        set_token(next, TOKID_LITERAL, TOKID_LIT_STR, 0, len);
+        set_token(next, EX_TOKID_LITERAL, EX_TOKID_LIT_STR, 0, len);
 
         return len;
 }
@@ -276,7 +276,7 @@ parse_ident(
                 return 0;
         }
         
-        set_token(next, TOKID_IDENT, 0, 0, len);
+        set_token(next, EX_TOKID_IDENT, 0, 0, len);
 
         return len;
 }
@@ -290,7 +290,7 @@ parse_unknown(
         (void)next;
         (void)src;
 
-        set_token(next, TOKID_UNKNOWN, 0, 0, 1);
+        set_token(next, EX_TOKID_UNKNOWN, 0, 0, 1);
         return 1;
 }
 
@@ -317,7 +317,7 @@ parse_whitespace(
         len = end - src;
 
         if(len) {
-                set_token(next, TOKID_WHITESPACE, 0, 0, len);      
+                set_token(next, EX_TOKID_WHITESPACE, 0, 0, len);      
         }
 
         return len;
@@ -339,7 +339,7 @@ parse_punct(
 
                 if(cmp == 0) {
                         int sub_id = sub_punct[i].token_sub_id;
-                        set_token(next, TOKID_PUNCT, sub_id, 0, pat_len);
+                        set_token(next, EX_TOKID_PUNCT, sub_id, 0, pat_len);
 
                         return pat_len;
                 }
@@ -391,7 +391,7 @@ expr_lexer_create(
 
         /* loop through characters */
         while(*src) {
-                set_token(token, TOKID_NULL, 0, 0, 0);      
+                set_token(token, EX_TOKID_NULL, 0, 0, 0);      
 
                 int consume = 0;
 
@@ -423,8 +423,8 @@ expr_lexer_create(
 
                 token->src_offset = src - start;
 
-                if(desc->skip_whitespace && token->id == TOKID_WHITESPACE) {
-                        set_token(token, TOKID_NULL, 0, 0, 0);      
+                if(desc->skip_whitespace && token->id == EX_TOKID_WHITESPACE) {
+                        set_token(token, EX_TOKID_NULL, 0, 0, 0);      
                         token -= 1;
                 }
 

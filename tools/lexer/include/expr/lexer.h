@@ -3,24 +3,24 @@
 
 
 enum expr_token_id {
-        TOKID_NULL,
-        TOKID_UNKNOWN,
-        TOKID_LITERAL,
-        TOKID_WHITESPACE,
-        TOKID_IDENT,
-        TOKID_PUNCT,
+        EX_TOKID_NULL,
+        EX_TOKID_UNKNOWN,
+        EX_TOKID_LITERAL,
+        EX_TOKID_WHITESPACE,
+        EX_TOKID_IDENT,
+        EX_TOKID_PUNCT,
 
         /* whitespace sub ids */
-        TOKID_WS_SPACE,
-        TOKID_WS_TAB,
-        TOKID_IS_NEWLINE,
+        EX_TOKID_WS_SPACE,
+        EX_TOKID_WS_TAB,
+        EX_TOKID_IS_NEWLINE,
 
         /* literal sub ids */
-        TOKID_LIT_NUM,
-        TOKID_LIT_HEX,
-        TOKID_LIT_BIN,
-        TOKID_LIT_FLT,
-        TOKID_LIT_STR,
+        EX_TOKID_LIT_NUM,
+        EX_TOKID_LIT_HEX,
+        EX_TOKID_LIT_BIN,
+        EX_TOKID_LIT_FLT,
+        EX_TOKID_LIT_STR,
 };
 
 

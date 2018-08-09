@@ -201,7 +201,7 @@ main(int argc, char **argv)
 
         /* output the stream on the console */
         if(output_stream) {
-                while(tok->id != TOKID_NULL) {
+                while(tok->id != EX_TOKID_NULL) {
                         printf("tok: (%d|%d) - [%.*s]\n",
                             tok->id,
                             tok->sub_id,
@@ -217,7 +217,7 @@ main(int argc, char **argv)
                 tok = &toks[0];
 
                 if(file) {
-                        while(tok->id != TOKID_NULL) {
+                        while(tok->id != EX_TOKID_NULL) {
                                 /* todo write file format */
                                 printf("need interweb as reference");
                         }
