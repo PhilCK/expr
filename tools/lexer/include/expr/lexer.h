@@ -57,6 +57,9 @@ struct expr_lexer_create_desc {
 };
 
 
+/* ---------------------------------------------------------- [ Lifetime ] -- */
+
+
 struct expr_token*
 expr_lexer_create(
         struct expr_lexer_create_desc *desc);

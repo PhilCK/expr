@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdlib.h>
 
+
 /* -------------------------------------------------- [ Application Vars ] -- */
 
 
@@ -218,8 +219,19 @@ main(int argc, char **argv)
 
                 if(file) {
                         while(tok->id != EX_TOKID_NULL) {
-                                /* todo write file format */
-                                printf("need interweb as reference");
+                                char line[256] = {0};
+                                sprintf(
+                                        line,
+                                        "%d %d %d %d",
+                                        tok->id,
+                                        tok->sub_id,
+                                        tok->src_offset,
+                                        tok->src_len);
+
+                                fputs(line, file);
+                                putc('\n', file);
+
+                                tok += 1;
                         }
 
                         fclose(file);
