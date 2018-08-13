@@ -1,41 +1,68 @@
-#ifndef LEXER_INCLUDED
-#define LEXER_INCLUDED
+#ifndef LEXER_INCLUDED_
+#define LEXER_INCLUDED_
 
 
 enum expr_token_id {
-        TOKID_NULL,
-        TOKID_NUM_LIT,
-        TOKID_HEX_LIT,
-        TOKID_BIN_LIT,
-        TOKID_FLT_LIT,
-        TOKID_STR_LIT,
-        TOKID_IDENT,
-        TOKID_PUNT,
+        EX_TOKID_NULL,
+        EX_TOKID_UNKNOWN,
+        EX_TOKID_LITERAL,
+        EX_TOKID_WHITESPACE,
+        EX_TOKID_IDENT,
+        EX_TOKID_PUNCT,
+
+        /* whitespace sub ids */
+        EX_TOKID_WS_SPACE,
+        EX_TOKID_WS_TAB,
+        EX_TOKID_IS_NEWLINE,
+
+        /* literal sub ids */
+        EX_TOKID_LIT_NUM,
+        EX_TOKID_LIT_HEX,
+        EX_TOKID_LIT_BIN,
+        EX_TOKID_LIT_FLT,
+        EX_TOKID_LIT_STR,
+};
+
+
+enum expr_type_id {
+        EX_LEX_TYPEID_NULL,
+        EX_LEX_TYPEID_CREATE,
 };
 
 
 struct expr_token {
-        int token_id;
-        int token_sub_id;
+        int id;
+        int sub_id;
 
-        const char *src;
-        int len;
-
-        struct expr_token *next;
+        int src_offset;
+        int src_len;
 };
 
 
-struct expr_sub_puntuation {
+struct expr_sub_punctuation {
         const char *pattern;
         int token_sub_id;
 };
 
 
+struct expr_lexer_create_desc {
+        int type_id;
+        void *ext;
+
+        const char *src;
+        struct expr_sub_punctuation *punctuation;
+        int punctuation_count;
+
+        int skip_whitespace;
+};
+
+
+/* ---------------------------------------------------------- [ Lifetime ] -- */
+
+
 struct expr_token*
 expr_lexer_create(
-        const char *src,
-        struct expr_sub_puntuation *puntuation,
-        int puntuation_len);
+        struct expr_lexer_create_desc *desc);
 
 
 void

@@ -1,0 +1,34 @@
+
+
+import std.io;
+
+
+volatile *int button_a = 0x0000001;
+
+
+float positions[+];
+
+positions[+] = 1.f; /* push */
+positions[-];  /* pop */
+positions[+3]; /* push 3 */
+positions[-3]; /* pop 3 */
+positions[-1]; /* back */
+positions[0]; /* front */
+
+
+void render()
+{
+        push(positions, 1.f);
+        push(positions, 2.f);
+        push(positions, 3.f);
+
+        printf("hello");
+}
+
+
+
+[private]
+void bar()
+{
+        printf("%s", "foobar");
+}
