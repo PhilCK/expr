@@ -47,6 +47,9 @@ struct expr_sub_punctuation {
 };
 
 
+/* ------------------------------------------------------------- Lifetime --- */
+
+
 struct expr_lexer_create_desc {
         int type_id;
         void *ext;
@@ -59,9 +62,6 @@ struct expr_lexer_create_desc {
 };
 
 
-/* ------------------------------------------------------------- Lifetime --- */
-
-
 struct expr_token*
 expr_lexer_create(
         struct expr_lexer_create_desc *desc);
@@ -70,6 +70,15 @@ expr_lexer_create(
 void
 expr_lexer_destroy(
         struct expr_token *destroy);
+
+
+/* ----------------------------------------------------------------- Print -- */
+
+
+void
+expr_lexer_print(
+        struct expr_token *toks,
+        const char *src);
 
 
 /* ------------------------------------------------------------- Serialize -- */
@@ -93,6 +102,8 @@ expr_lexer_serialize(
 struct expr_lexer_deserialize_desc {
         int type_id;
         void *ext;
+
+        const char *serialized_filename;
 
         struct expr_lexer_token *tokens;
 };

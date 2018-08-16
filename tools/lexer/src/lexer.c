@@ -450,6 +450,48 @@ expr_lexer_destroy(
 }
 
 
+/* ----------------------------------------------------------------- Print -- */
+
+
+void
+expr_lexer_print(
+        struct expr_token *toks,
+        const char *src)
+{
+        struct expr_token *t = &toks[0];
+
+        assert(toks);
+
+        if(!toks) {
+                return;
+        }
+
+        if(src) {
+                while(t->id != EX_TOKID_NULL) {
+                        printf("tok: (%d|%d) - [%.*s]\n",
+                                t->id,
+                                t->sub_id,
+                                t->src_len,
+                                &src[t->src_offset]);
+
+                        t += 1;
+                }
+        }
+        else {
+                while(t->id != EX_TOKID_NULL) {
+                        printf("tok: (%d|%d) - [%d|%d]\n",
+                                t->id,
+                                t->sub_id,
+                                t->src_offset,
+                                t->src_len);
+
+                        t += 1;
+
+                }
+        }
+}
+
+
 /* ------------------------------------------------------------- Serialize -- */
 
 
@@ -461,13 +503,14 @@ expr_lexer_serialize(
         file = fopen(desc->serialize_filename, "w");
 
         if(!file) {
+                printf("Failed to open file to serialize!\n");
                 return 0;
         }
 
         struct expr_token *t = &desc->tokens[0];
 
         while(t->id != EX_TOKID_NULL) {
-                char line[256] = {0};
+                char line[64] = {0};
                 sprintf(
                         line,
                         "%d %d %d %d",
@@ -492,7 +535,22 @@ struct expr_token*
 expr_lexer_deserialize(
         struct expr_lexer_deserialize_desc *desc)
 {
-        return 0;
+        FILE *file = 0;
+        file = fopen(desc->serialized_filename, "r");
+
+        if(!file) {
+                printf("Failed to open file to deserialize!\n");
+                return 0;
+        }
+
+        struct expr_token *start_token = calloc(sizeof(*start_token) * 1000, 1);
+        struct expr_token *t = start_token;
+
+        while(fscanf(file,"%d %d %d %d[^\n]", &t->id, &t->sub_id, &t->src_offset, &t->src_len)) {
+                t += 1;
+        }
+
+        return start_token;
 }
 
 

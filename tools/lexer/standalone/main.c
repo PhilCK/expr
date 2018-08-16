@@ -198,18 +198,10 @@ main(int argc, char **argv)
         lex_desc.skip_whitespace   = 1;
 
         struct expr_token *toks = expr_lexer_create(&lex_desc);
-        struct expr_token *tok  = &toks[0];
 
         /* output the stream on the console */
         if(output_stream) {
-                while(tok->id != EX_TOKID_NULL) {
-                        printf("tok: (%d|%d) - [%.*s]\n",
-                            tok->id,
-                            tok->sub_id,
-                            tok->src_len,
-                            &src[tok->src_offset]);
-                        tok += 1;
-                }
+                expr_lexer_print(toks, src);
         }
 
         if(output_file) {
