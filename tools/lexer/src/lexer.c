@@ -350,7 +350,7 @@ parse_punct(
 }
 
 
-/* --------------------------------------------------------- [ Interface ] -- */
+/* -------------------------------------------------------------- Lifetime -- */
 
 
 typedef int(*parser_fn)(struct expr_token *, const char *);
@@ -448,3 +448,51 @@ expr_lexer_destroy(
 
         EXPR_VARR_DESTROY(destroy);
 }
+
+
+/* ------------------------------------------------------------- Serialize -- */
+
+
+int
+expr_lexer_serialize(
+        struct expr_lexer_serialize_desc *desc)
+{
+        FILE *file = 0;
+        file = fopen(desc->serialize_filename, "w");
+
+        if(!file) {
+                return 0;
+        }
+
+        struct expr_token *t = &desc->tokens[0];
+
+        while(t->id != EX_TOKID_NULL) {
+                char line[256] = {0};
+                sprintf(
+                        line,
+                        "%d %d %d %d",
+                        t->id,
+                        t->sub_id,
+                        t->src_offset,
+                        t->src_len);
+
+                fputs(line, file);
+                putc('\n', file);
+
+                t += 1;
+        }
+
+        fclose(file);
+
+        return 1;
+}
+
+
+struct expr_token*
+expr_lexer_deserialize(
+        struct expr_lexer_deserialize_desc *desc)
+{
+        return 0;
+}
+
+

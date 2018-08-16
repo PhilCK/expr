@@ -1,0 +1,42 @@
+{
+        "projects": [
+                {
+                        "name": "ast",
+                        "kind": "StaticLib",
+                        "language": "C-ANSI",
+
+                        "files": [
+                                "./include/**.h",
+                                "./src/**.c",
+                                "./src/**.h"
+                        ],
+
+                        "include_dirs_public": [
+                                "./include"
+                        ],
+
+                        "include_dirs": [
+                                "./src"
+                        ],
+
+                        "dependencies": [
+                                "fundamental",
+                                "lexer"
+                        ]
+                },
+                {
+                        "name": "expr_ast",
+                        "kind": "ConsoleApp",
+
+                        "files": [
+                                "./standalone/**.h",
+                                "./standalone/**.c"
+                        ],
+
+                        "dependencies": [
+                                "ast",
+                                "lexer"
+                        ]
+                }
+        ]
+}

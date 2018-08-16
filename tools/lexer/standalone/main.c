@@ -43,7 +43,7 @@ process_args(int argc, char **argv)
                                 printf("Missing mapping filename\n");
                                 return 0;
                         }
-                        
+
                         mapping_file = argv[i + 1];
                         ++i;
                 }
@@ -127,7 +127,7 @@ main(int argc, char **argv)
 
         struct expr_sub_punctuation *expr_sub_punct = 0;
         int expr_sub_punct_count = 0;
-        
+
         if(i == 0) {
                 printf("Failed processing args\n");
                 return 1;
@@ -187,7 +187,7 @@ main(int argc, char **argv)
                         mapping_src += 1;
                 }
         }
-         
+
         /* create tokens setup  */ 
         struct expr_lexer_create_desc lex_desc;
         lex_desc.type_id           = EX_LEX_TYPEID_CREATE;
@@ -213,30 +213,14 @@ main(int argc, char **argv)
         }
 
         if(output_file) {
-                FILE *file = 0;
-                file = fopen(output_file, "w");
-                tok = &toks[0];
+                struct expr_lexer_serialize_desc out_desc = {0};
+                out_desc.type_id = EX_LEX_TYPEID_SERIALIZE;
+                out_desc.serialize_filename = output_file;
+                out_desc.tokens = toks;
 
-                if(file) {
-                        while(tok->id != EX_TOKID_NULL) {
-                                char line[256] = {0};
-                                sprintf(
-                                        line,
-                                        "%d %d %d %d",
-                                        tok->id,
-                                        tok->sub_id,
-                                        tok->src_offset,
-                                        tok->src_len);
-
-                                fputs(line, file);
-                                putc('\n', file);
-
-                                tok += 1;
-                        }
-
-                        fclose(file);
+                if(!expr_lexer_serialize(&out_desc)) {
+                        printf("Failed to serialize to file\n");
                 }
-
         }
 
         printf("end\n");

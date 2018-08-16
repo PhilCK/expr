@@ -24,9 +24,11 @@ enum expr_token_id {
 };
 
 
-enum expr_type_id {
+enum expr_lex_type_id {
         EX_LEX_TYPEID_NULL,
         EX_LEX_TYPEID_CREATE,
+        EX_LEX_TYPEID_SERIALIZE,
+        EX_LEX_TYPEID_DESERIALIZE,
 };
 
 
@@ -57,7 +59,7 @@ struct expr_lexer_create_desc {
 };
 
 
-/* ---------------------------------------------------------- [ Lifetime ] -- */
+/* ------------------------------------------------------------- Lifetime --- */
 
 
 struct expr_token*
@@ -68,6 +70,37 @@ expr_lexer_create(
 void
 expr_lexer_destroy(
         struct expr_token *destroy);
+
+
+/* ------------------------------------------------------------- Serialize -- */
+
+
+struct expr_lexer_serialize_desc {
+        int type_id;
+        void *ext;
+
+        const char *serialize_filename;
+
+        struct expr_token *tokens;
+};
+
+
+int
+expr_lexer_serialize(
+        struct expr_lexer_serialize_desc *desc);
+
+
+struct expr_lexer_deserialize_desc {
+        int type_id;
+        void *ext;
+
+        struct expr_lexer_token *tokens;
+};
+
+
+struct expr_token *
+expr_lexer_deserialize(
+        struct expr_lexer_deserialize_desc *desc);
 
 
 /* inc guard */
