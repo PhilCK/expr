@@ -104,8 +104,6 @@ struct expr_lexer_deserialize_desc {
         void *ext;
 
         const char *serialized_filename;
-
-        struct expr_lexer_token *tokens;
 };
 
 

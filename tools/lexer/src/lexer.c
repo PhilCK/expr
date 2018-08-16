@@ -468,7 +468,8 @@ expr_lexer_print(
 
         if(src) {
                 while(t->id != EX_TOKID_NULL) {
-                        printf("tok: (%d|%d) - [%.*s]\n",
+                        printf("%d tok: (%d|%d) - [%.*s]\n",
+                                (int)(t - toks),
                                 t->id,
                                 t->sub_id,
                                 t->src_len,
@@ -479,7 +480,8 @@ expr_lexer_print(
         }
         else {
                 while(t->id != EX_TOKID_NULL) {
-                        printf("tok: (%d|%d) - [%d|%d]\n",
+                        printf("%d tok: (%d|%d) - [%d|%d]\n",
+                                (int)(t - toks),
                                 t->id,
                                 t->sub_id,
                                 t->src_offset,
@@ -546,7 +548,8 @@ expr_lexer_deserialize(
         struct expr_token *start_token = calloc(sizeof(*start_token) * 1000, 1);
         struct expr_token *t = start_token;
 
-        while(fscanf(file,"%d %d %d %d[^\n]", &t->id, &t->sub_id, &t->src_offset, &t->src_len)) {
+        while(fscanf(file,"%d %d %d %d[^\n]", &t->id, &t->sub_id, &t->src_offset, &t->src_len) == 4) {
+                printf("scaned");
                 t += 1;
         }
 
