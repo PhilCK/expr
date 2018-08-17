@@ -2,6 +2,7 @@
 #include <expr/lexer.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 
 static const char *token_file = 0;
@@ -125,7 +126,13 @@ main(int argc, char **argv) {
                 return 0;
         }
 
-        /* todo - load src file */
+        /* load src file */
+        unsigned bytes = 0;
+        expr_file_load(src_file, 0, &bytes);
+        src = calloc(bytes, 1);
+        expr_file_load(src_file, &src, 0);
+
+        printf("%d, %s\n", (int)bytes, src);
 
         if(PRINT_DESER_TOKENS) {
                 expr_lexer_print(tokens, src);
