@@ -12,6 +12,7 @@ const char *mapping_file = 0;
 const char *input_file = 0;
 const char *output_file = 0;
 int output_stream = 0;
+int skip_whitespace = 1;
 
 
 /* ------------------------------------------------------- [ Arg Helpers ] -- */
@@ -25,6 +26,7 @@ print_help()
         printf("-m <filepath>  -file that contains a list of punctuation\n");
         printf("-o <filename>  -outputs the token stream to a file\n");
         printf("-os            -outputs the token stream to stdout\n");
+        printf("-w             -tokenizes the whitespace\n");
         printf("-h             -outputs this dialog\n");
 }
 
@@ -62,13 +64,16 @@ process_args(int argc, char **argv)
                 /* output */
                 else if(strcmp(argv[i], "-os") == 0) {
                         output_stream = 1;
-                        ++i;
+                }
+
+                /* whitespace */
+                else if(strcmp(argv[i], "-w") == 0) {
+                        skip_whitespace = 0;
                 }
 
                 /* help */
                 else if(strcmp(argv[i], "-h") == 0) {
                         print_help();
-                        ++i;
                 }
 
                 /* file to read */
@@ -195,7 +200,7 @@ main(int argc, char **argv)
         lex_desc.src               = src;
         lex_desc.punctuation       = expr_sub_punct;
         lex_desc.punctuation_count = expr_sub_punct_count;
-        lex_desc.skip_whitespace   = 1;
+        lex_desc.skip_whitespace   = skip_whitespace;
 
         struct expr_token *toks = expr_lexer_create(&lex_desc);
 

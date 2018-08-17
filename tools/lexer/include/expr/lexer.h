@@ -13,7 +13,7 @@ enum expr_token_id {
         /* whitespace sub ids */
         EX_TOKID_WS_SPACE,
         EX_TOKID_WS_TAB,
-        EX_TOKID_IS_NEWLINE,
+        EX_TOKID_WS_NEWLINE,
 
         /* literal sub ids */
         EX_TOKID_LIT_NUM,

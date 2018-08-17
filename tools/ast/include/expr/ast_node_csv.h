@@ -3,7 +3,10 @@
 
 
 enum expr_ast_node_csv_id {
+        /* row and row subtypes */
         EX_AST_CSV_ROW,
+        EX_AST_CSV_ROW_HEADER,
+        EX_AST_CSV_ROW_CONTENT,
 
         /* cell and cell subtypes */
         EX_AST_CSV_CELL,
@@ -20,6 +23,9 @@ enum expr_ast_node_csv_id {
         EX_AST_CSV_CELL_FLOAT4,
         EX_AST_CSV_CELL_FLOATX,
         EX_AST_CSV_CELL_BOOL,
+
+        /* delim type */
+        EX_AST_CSV_DELIM,
 };
 
 
