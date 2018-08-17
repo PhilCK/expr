@@ -27,8 +27,9 @@ expr_file_load(
                 *bytes = (unsigned)length;
         }
 
+        /* not a fail, just return */
         if(!memory) {
-                return 0;
+                return 1;
         }
 
         fseek(f, 0, SEEK_SET);
