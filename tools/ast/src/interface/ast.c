@@ -22,3 +22,14 @@ expr_ast_destroy(
         return 0;
 }
 
+
+/* ----------------------------------------------------------------- Print -- */
+
+
+int
+expr_ast_print(
+        struct expr_ast_node *root,
+        const char *src)
+{
+        return 0;
+}

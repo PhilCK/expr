@@ -11,6 +11,7 @@ static struct expr_token *tokens = 0;
 static const char *src = 0;
 static int output_stream = 0;
 static const char *output_file = 0;
+static int ast_type = 0;
 
 
 /* ---------------------------------------------------------------- Config -- */
@@ -28,6 +29,7 @@ print_help()
 {
         printf("usage: expr_ast <token_file> <src_file> <options>\n\n");
         printf("options\n");
+        printf("-t <type>     -process ast as (csv)\n");
         printf("-o <filename> -outputs the ast stream to a file\n");
         printf("-os           -outputs the ast stream to stdout\n");
         printf("-h            -outputs this dialog\n");
@@ -55,6 +57,15 @@ process_args(
 
                         output_file = argv[i + 1];
                         ++i;
+                }
+                else if(strcmp(argv[i], "-t") == 0) {
+                        if(argc < i + 1) {
+                                return 0;
+                        }
+
+                        if(strcmp(argv[i + 1], "csv") == 0) {
+                                ast_type = EX_AST_TYPE_CSV;
+                        }
                 }
                 else if(strcmp(argv[i], "-os") == 0) {
                         output_stream = 1;
@@ -128,19 +139,33 @@ main(int argc, char **argv) {
 
         /* load src file */
         unsigned bytes = 0;
-        expr_file_load(src_file, 0, &bytes);
-        src = calloc(bytes, 1);
-        expr_file_load(src_file, &src, 0);
+        if(!expr_file_load(src_file, 0, &bytes)) {
+                printf("Failed to load src file\n");
+                return 0;
+        }
 
-        printf("%d, %s\n", (int)bytes, src);
+        src = calloc(bytes, 1);
+        if(!expr_file_load(src_file, &src, 0)) {
+                printf("Failed to write src file\n");
+                return 0;
+        }
 
         if(PRINT_DESER_TOKENS) {
                 expr_lexer_print(tokens, src);
         }
 
-        /* request ast with nodes */
+        /* ast */
+        struct expr_ast_create_desc ast_desc = {0};
+        ast_desc.type_id = EX_AST_TYPEID_CREATE;
+        ast_desc.ast_type = EX_AST_TYPE_CSV;
+        ast_desc.token_streams = &tokens;
+        ast_desc.stream_count = 1;
+
+        struct expr_ast_node *root_ast = expr_ast_create(&ast_desc);
 
         /* stream output */
+        expr_ast_print(root_ast, src);
+
 
         return 0;
 }

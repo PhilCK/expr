@@ -19,7 +19,13 @@ struct expr_ast_node {
 
 enum expr_ast_type_id {
         EX_AST_TYPEID_NULL,
-        EX_AST_TYPEID_CSV,
+        EX_AST_TYPEID_CREATE,
+};
+
+
+enum expr_ast_type {
+        EX_AST_TYPE_NONE,
+        EX_AST_TYPE_CSV,
 };
 
 
@@ -45,6 +51,16 @@ expr_ast_create(
 int
 expr_ast_destroy(
         struct expr_ast_node *root_node);
+
+
+/* ----------------------------------------------------------------- Print -- */
+
+
+int
+expr_ast_print(
+        struct expr_ast_node *root,
+        const char *src);
+
 
 /* inc guard */
 #endif
