@@ -6,11 +6,11 @@ struct expr_ast_node {
         int id;
         int sub_id;
 
-        struct ast_node *parent;
-        struct ast_node *next;
+        struct expr_ast_node *parent;
+        struct expr_ast_node *next;
 
-        struct ast_node *l_param;
-        struct ast_node *r_param;
+        struct expr_ast_node *l_param;
+        struct expr_ast_node *r_param;
 
         unsigned src_offset;
         unsigned src_len;

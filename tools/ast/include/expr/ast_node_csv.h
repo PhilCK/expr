@@ -3,6 +3,8 @@
 
 
 enum expr_ast_node_csv_id {
+        EX_AST_CSV_DOC,
+
         /* row and row subtypes */
         EX_AST_CSV_ROW,
         EX_AST_CSV_ROW_HEADER,
