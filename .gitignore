@@ -7,3 +7,6 @@ premake5.exe
 # VIM temp files
 *.swp
 *.swo
+
+#CTags
+tags
