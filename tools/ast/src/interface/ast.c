@@ -17,6 +17,7 @@ expr_ast_create(
         csv_desc.type_id = EX_AST_TYPEID_CSV_CREATE_DESC;
         csv_desc.tokens = desc->token_streams[0];
         csv_desc.src = desc->src_streams[0];
+        csv_desc.delim = ",";
         
         struct expr_ast_node *ast = expr_tokens_to_csv_ast(&csv_desc);
 

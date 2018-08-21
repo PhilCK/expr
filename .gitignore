@@ -1,7 +1,9 @@
+# Build things
 /build*
 /Build*
 premake5
 premake5.exe
 
-
+# VIM temp files
 *.swp
+*.swo
