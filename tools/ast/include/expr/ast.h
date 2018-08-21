@@ -39,6 +39,7 @@ struct expr_ast_create_desc {
         int ast_type;
 
         struct expr_token **token_streams;
+        const char **src_streams;
         int stream_count;
 };
 

@@ -11,7 +11,16 @@ struct expr_ast_node*
 expr_ast_create(
         struct expr_ast_create_desc *desc)
 {
-        return 0;
+        assert(desc);
+
+        struct expr_ast_csv_create_desc csv_desc = {0};
+        csv_desc.type_id = EX_AST_TYPEID_CSV_CREATE_DESC;
+        csv_desc.tokens = desc->token_streams[0];
+        csv_desc.src = desc->src_streams[0];
+        
+        struct expr_ast_node *ast = expr_tokens_to_csv_ast(&csv_desc);
+
+        return  ast;
 }
 
 

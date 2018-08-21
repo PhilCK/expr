@@ -1,5 +1,6 @@
 #include <expr/ast.h>
 #include <expr/lexer.h>
+#include <expr/file.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -157,6 +158,7 @@ main(int argc, char **argv) {
         ast_desc.type_id = EX_AST_TYPEID_CREATE;
         ast_desc.ast_type = EX_AST_TYPE_CSV;
         ast_desc.token_streams = &tokens;
+        ast_desc.src_streams = &src;
         ast_desc.stream_count = 1;
 
         struct expr_ast_node *root_ast = expr_ast_create(&ast_desc);

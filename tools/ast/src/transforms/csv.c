@@ -1,8 +1,10 @@
 #include <transforms/transforms.h>
 #include <expr/ast.h>
+#include <expr/file.h>
 #include <expr/ast_node_csv.h>
 #include <expr/lexer.h>
 #include <stdlib.h>
+#include <string.h>
 
 
 /* -------------------------------------------------------------- Helpers  -- */
@@ -19,9 +21,7 @@ parse_rows(
         struct expr_ast_node *cr = 0;
         struct expr_token *ct = t;
 
-
-
-        while(*ct->id != EX_TOKID_NULL) {
+        while(ct->id != EX_TOKID_NULL) {
                 /* add new row and cell */
                 cn += 1;
                 cn[0].id = EX_AST_CSV_ROW;
@@ -40,20 +40,19 @@ parse_rows(
                 cr = cn;
                 cn += 1;
 
-                while(*ct->sub_id != EX_TOKID_WS_NEWLINE) {
+                while(ct->sub_id != EX_TOKID_WS_NEWLINE) {
                           /* new cell */
                           
 
-                          unsigned src_offset = cn[0].src_offset;
-                          unsigned 
+                          unsigned src_offset = cn[0].src_offset; 
 
-                          unsigned delim_len = strlen(delmim);
+                          int delim_len = strlen(delim);
 
                           /* length of cell */
                           while(1) {
                                   /* is this a delim */
 
-                                  /* add
+                                  /* add */
                           } 
                 }
         }
@@ -84,7 +83,7 @@ expr_tokens_to_csv_ast(
         root_node[0].l_param = &root_node[1];
         root_node[0].r_param = 0;
         root_node[0].src_offset = 0;
-        root_node[0].src_len = sizeof(desc->src);
+        root_node[0].src_len = strlen(desc->src);
 
         parse_rows(root_node, desc->tokens, desc->src, desc->delim);
 
