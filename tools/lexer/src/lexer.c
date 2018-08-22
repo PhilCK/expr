@@ -379,8 +379,11 @@ expr_lexer_create(
         struct expr_lexer_create_desc *desc)
 {
         /* variables */
-        struct expr_token *start_token = expr_varray_create(sizeof(*start_token), 1 << 24);
-        struct expr_token *token = &start_token[0];
+        struct expr_token *start_token = 0;
+        ex_varr_create(start_token, 1 << 24);
+
+        struct expr_token *token = start_token;
+
         const char *start = 0;
         const char *src = 0;
 
@@ -443,10 +446,11 @@ expr_lexer_create(
 
                 if(desc->skip_whitespace && token->id == EX_TOKID_WHITESPACE) {
                         set_token(token, EX_TOKID_NULL, 0, 0, 0);      
-                        token -= 1;
+                }
+                else {
+                        ex_varr_push(start_token, token);
                 }
 
-                token += 1;
                 src += consume;
         }
 
