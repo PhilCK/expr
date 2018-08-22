@@ -10,9 +10,18 @@
 /* ------------------------------------------------------------ [ Tables ] -- */
 
 
-static const char  whitespace[] = {
+static const char whitespace[] = {
         ' ', '\t', '\n', '\r',
         '\0'
+};
+
+
+/* must match whitespace[] */
+static int whitespace_sub_id[] = {
+        EX_TOKID_WS_SPACE,
+        EX_TOKID_WS_TAB,
+        EX_TOKID_WS_NEWLINE,
+        EX_TOKID_WS_NEWLINE, 
 };
 
 
@@ -301,23 +310,32 @@ parse_whitespace(
         const char *src)
 {
         const char *end = src;
-        int len;
+        int len, i, sub_id;
 
         assert(next);
         assert(src);
 
         if (!is_whitespace(*src)) {
                 return 0;
-        }
-        
-        while (is_whitespace(*end)) {
+        } 
+
+        while (*end == *src) {
                 end += 1;
         }
 
         len = end - src;
 
         if(len) {
-                set_token(next, EX_TOKID_WHITESPACE, 0, 0, len);      
+                sub_id = 0;
+
+                for(i = 0; i < EX_ARR_COUNT(whitespace_sub_id); ++i) {
+                        if(*src == whitespace[i]) {
+                                sub_id = whitespace_sub_id[i];
+                                break;
+                        }
+                }
+
+                set_token(next, EX_TOKID_WHITESPACE, sub_id, 0, len);      
         }
 
         return len;
@@ -350,7 +368,7 @@ parse_punct(
 }
 
 
-/* --------------------------------------------------------- [ Interface ] -- */
+/* -------------------------------------------------------------- Lifetime -- */
 
 
 typedef int(*parser_fn)(struct expr_token *, const char *);
@@ -448,3 +466,120 @@ expr_lexer_destroy(
 
         EXPR_VARR_DESTROY(destroy);
 }
+
+
+/* ----------------------------------------------------------------- Print -- */
+
+
+void
+expr_lexer_print(
+        struct expr_token *toks,
+        const char *src)
+{
+        struct expr_token *t = &toks[0];
+
+        assert(toks);
+
+        if(!toks) {
+                return;
+        }
+
+        if(src) {
+                while(t->id != EX_TOKID_NULL) {
+                        printf("%d tok: (%d|%d) - [%.*s]\n",
+                                (int)(t - toks),
+                                t->id,
+                                t->sub_id,
+                                t->src_len,
+                                &src[t->src_offset]);
+
+                        t += 1;
+                }
+        }
+        else {
+                while(t->id != EX_TOKID_NULL) {
+                        printf("%d tok: (%d|%d) - [%d|%d]\n",
+                                (int)(t - toks),
+                                t->id,
+                                t->sub_id,
+                                t->src_offset,
+                                t->src_len);
+
+                        t += 1;
+
+                }
+        }
+}
+
+
+/* ------------------------------------------------------------- Serialize -- */
+
+
+int
+expr_lexer_serialize(
+        struct expr_lexer_serialize_desc *desc)
+{
+        FILE *file = 0;
+        file = fopen(desc->serialize_filename, "wb");
+
+        if(!file) {
+                printf("Failed to open file to serialize!\n");
+                return 0;
+        }
+
+        struct expr_token *t = &desc->tokens[0];
+
+        while(t->id != EX_TOKID_NULL) {
+                char line[64] = {0};
+                sprintf(
+                        line,
+                        "%d %d %d %d",
+                        t->id,
+                        t->sub_id,
+                        t->src_offset,
+                        t->src_len);
+
+                fputs(line, file);
+                putc('\n', file);
+
+                t += 1;
+        }
+
+        fclose(file);
+
+        return 1;
+}
+
+
+struct expr_token*
+expr_lexer_deserialize(
+        struct expr_lexer_deserialize_desc *desc)
+{
+        FILE *file = 0;
+        file = fopen(desc->serialized_filename, "r");
+
+        if(!file) {
+                printf("Failed to open file to deserialize!\n");
+                return 0;
+        }
+
+        struct expr_token *start_token = calloc(sizeof(*start_token) * 1000, 1);
+        struct expr_token *t = start_token;
+
+        const char *fmt = "%d %d %d %d[^\n]";
+
+        while(fscanf(
+                      file,
+                      fmt,
+                      &t->id,
+                      &t->sub_id,
+                      &t->src_offset,
+                      &t->src_len) == 4)
+        {
+                t += 1;
+        }
+
+        return start_token;
+}
+
+

@@ -13,7 +13,7 @@ enum expr_token_id {
         /* whitespace sub ids */
         EX_TOKID_WS_SPACE,
         EX_TOKID_WS_TAB,
-        EX_TOKID_IS_NEWLINE,
+        EX_TOKID_WS_NEWLINE,
 
         /* literal sub ids */
         EX_TOKID_LIT_NUM,
@@ -24,9 +24,11 @@ enum expr_token_id {
 };
 
 
-enum expr_type_id {
+enum expr_lex_type_id {
         EX_LEX_TYPEID_NULL,
         EX_LEX_TYPEID_CREATE,
+        EX_LEX_TYPEID_SERIALIZE,
+        EX_LEX_TYPEID_DESERIALIZE,
 };
 
 
@@ -45,6 +47,9 @@ struct expr_sub_punctuation {
 };
 
 
+/* ------------------------------------------------------------- Lifetime --- */
+
+
 struct expr_lexer_create_desc {
         int type_id;
         void *ext;
@@ -57,9 +62,6 @@ struct expr_lexer_create_desc {
 };
 
 
-/* ---------------------------------------------------------- [ Lifetime ] -- */
-
-
 struct expr_token*
 expr_lexer_create(
         struct expr_lexer_create_desc *desc);
@@ -68,6 +70,46 @@ expr_lexer_create(
 void
 expr_lexer_destroy(
         struct expr_token *destroy);
+
+
+/* ----------------------------------------------------------------- Print -- */
+
+
+void
+expr_lexer_print(
+        struct expr_token *toks,
+        const char *src);
+
+
+/* ------------------------------------------------------------- Serialize -- */
+
+
+struct expr_lexer_serialize_desc {
+        int type_id;
+        void *ext;
+
+        const char *serialize_filename;
+
+        struct expr_token *tokens;
+};
+
+
+int
+expr_lexer_serialize(
+        struct expr_lexer_serialize_desc *desc);
+
+
+struct expr_lexer_deserialize_desc {
+        int type_id;
+        void *ext;
+
+        const char *serialized_filename;
+};
+
+
+struct expr_token *
+expr_lexer_deserialize(
+        struct expr_lexer_deserialize_desc *desc);
 
 
 /* inc guard */
