@@ -520,7 +520,7 @@ expr_lexer_serialize(
         struct expr_lexer_serialize_desc *desc)
 {
         FILE *file = 0;
-        file = fopen(desc->serialize_filename, "w");
+        file = fopen(desc->serialize_filename, "wb");
 
         if(!file) {
                 printf("Failed to open file to serialize!\n");
