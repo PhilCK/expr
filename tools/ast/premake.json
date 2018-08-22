@@ -20,8 +20,8 @@
                         ],
 
                         "dependencies": [
-                                "fundamental",
-                                "lexer"
+                                "lexer",
+                                "fundamental"
                         ]
                 },
                 {

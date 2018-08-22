@@ -379,7 +379,7 @@ expr_lexer_create(
         struct expr_lexer_create_desc *desc)
 {
         /* variables */
-        struct expr_token *start_token = calloc(sizeof(*start_token) * 1000, 1);
+        struct expr_token *start_token = expr_varray_create(sizeof(*start_token), 1 << 24);
         struct expr_token *token = &start_token[0];
         const char *start = 0;
         const char *src = 0;
