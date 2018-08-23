@@ -1,0 +1,38 @@
+{
+        "projects": [
+                {
+                        "name": "csv",
+                        "kind": "StaticLib",
+                        "language": "C-ANSI",
+
+                        "files": [
+                                "./include/**.h",
+                                "./src/**.c",
+                                "./src/**.h"
+                        ],
+
+                        "include_dirs_public": [
+                                "./include/"
+                        ],
+
+                        "dependencies": [
+                                "fundamental",
+                                "lexer",
+                                "ast"
+                        ]
+                },
+                {
+                        "name": "expr_csv",
+                        "kind": "ConsoleApp",
+
+                        "files": [
+                                "./standalone/**.h",
+                                "./standalone/**.c"
+                        ],
+
+                        "dependencies": [
+                                "csv"
+                        ]
+                }
+        ]
+}
