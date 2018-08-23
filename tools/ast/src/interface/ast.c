@@ -1,5 +1,6 @@
 #include <expr/ast.h>
 #include <expr/lexer.h>
+#include <expr/v_array.h>
 #include <transforms/transforms.h>
 #include <assert.h>
 
@@ -15,9 +16,9 @@ expr_ast_create(
 
         struct expr_ast_csv_create_desc csv_desc = {0};
         csv_desc.type_id = EX_AST_TYPEID_CSV_CREATE_DESC;
-        csv_desc.tokens = desc->token_streams[0];
-        csv_desc.src = desc->src_streams[0];
-        csv_desc.delim = ",";
+        csv_desc.tokens  = desc->token_streams[0];
+        csv_desc.src     = desc->src_streams[0];
+        csv_desc.delim   = ",";
         
         struct expr_ast_node *ast = expr_tokens_to_csv_ast(&csv_desc);
 
@@ -29,7 +30,13 @@ int
 expr_ast_destroy(
         struct expr_ast_node *root_node)
 {
-        return 0;
+        assert(root_node);
+
+        if (!root_node) {
+                return 0;
+        }
+
+        return expr_varray_destroy((void*)root_node);
 }
 
 

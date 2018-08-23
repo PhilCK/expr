@@ -19,7 +19,7 @@ void *
 expr_varray_create(int bytes_of_item, int count);
 
 int
-expr_varray_destroy(void **arr);
+expr_varray_destroy(void *arr);
 
 
 void *

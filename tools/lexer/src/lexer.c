@@ -10,11 +10,6 @@
 /* ------------------------------------------------------------ [ Tables ] -- */
 
 
-static const char whitespace[] = {
-        ' ', '\t', '\n', '\r',
-        '\0'
-};
-
 static const char *whitespace_str[] = {
         " ", "\t", "\n\r", "\r\n", "\r", "\n",
         0
@@ -112,7 +107,6 @@ contains_str(
 }
 
 
-static int is_whitespace(char c)    { return contains(c, whitespace);       }
 static int is_whitespace_str(const char *c, int *index) { return contains_str(c, whitespace_str, index); }
 static int is_alpha(char c)         { return contains(c, alpha);            }
 static int is_numeric(char c)       { return contains(c, numeric);          }
@@ -342,14 +336,13 @@ parse_whitespace(
         const char *src)
 {
         const char *end = src;
-        int len, i, sub_id;
+        int len, sub_id;
+        int index = 0;
 
         assert(next);
         assert(src);
 
-        int index = 0;
-
-        if (!is_whitespace(*src, &index)) {
+        if (!is_whitespace_str(src, &index)) {
                 return 0;
         } 
 
@@ -481,17 +474,17 @@ expr_lexer_create(
 }
 
 
-void
+int
 expr_lexer_destroy(
         struct expr_token *destroy)
 {
         assert(destroy);
 
         if(!destroy) {
-                return;
+                return 0;
         }
 
-        EXPR_VARR_DESTROY(destroy);
+        return expr_varray_destroy(destroy);
 }
 
 

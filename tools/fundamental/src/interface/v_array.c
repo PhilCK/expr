@@ -4,6 +4,7 @@
 #define _GNU_SOURCE
 #include <sys/mman.h>
 
+#error "incomplete"
 
 struct varray_header {
         void *addr;
@@ -72,6 +73,19 @@ expr_varray_create(int bytes_of_item, int count)
         header->stride = bytes_of_item;
 
         return header->curr;
+}
+
+
+int
+expr_varray_destroy(void *arr)
+{
+        if (arr == 0) {
+                return 0;
+        }
+
+        struct varray_header *header = (struct varray_header*)arr;
+
+        return VirtualFree(header->addr, 0, MEM_RELEASE);
 }
 
 

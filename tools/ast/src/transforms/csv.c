@@ -5,6 +5,7 @@
 #include <expr/v_array.h>
 #include <expr/lexer.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 
 
@@ -53,12 +54,14 @@ parse_cell(
                 return ct - *t;
         }
 
+        /*
         printf(
                 "Cell:%d %d %.*s\n",
                 (int)ct->src_offset,
                 len,
                 len,
                 &src[(*t)->src_offset]);
+        */
 
         if(last_cell && *last_cell) {
                 (*last_cell)->next = curr_cell;
@@ -106,7 +109,9 @@ parse_rows(
 
                 ex_varr_push(root_node, curr_row);
 
+                /*
                 printf("parse row %d %d %d - %.*s\n", ct->id, ct->src_len, ct->src_offset, ct->src_len, &src[ct->src_offset]);
+                */
 
                 /* add new row and cell */
                 curr_row->id          = EX_AST_CSV_ROW;
