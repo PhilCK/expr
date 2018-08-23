@@ -166,6 +166,7 @@ main(int argc, char **argv) {
         /* stream output */
         expr_ast_print(root_ast, src);
 
+        expr_ast_destroy(root_ast);
 
         return 0;
 }

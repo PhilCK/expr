@@ -67,7 +67,7 @@ expr_lexer_create(
         struct expr_lexer_create_desc *desc);
 
 
-void
+int
 expr_lexer_destroy(
         struct expr_token *destroy);
 

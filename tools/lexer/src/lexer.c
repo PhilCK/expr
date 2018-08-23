@@ -10,9 +10,9 @@
 /* ------------------------------------------------------------ [ Tables ] -- */
 
 
-static const char whitespace[] = {
-        ' ', '\t', '\n', '\r',
-        '\0'
+static const char *whitespace_str[] = {
+        " ", "\t", "\n\r", "\r\n", "\r", "\n",
+        0
 };
 
 
@@ -21,7 +21,9 @@ static int whitespace_sub_id[] = {
         EX_TOKID_WS_SPACE,
         EX_TOKID_WS_TAB,
         EX_TOKID_WS_NEWLINE,
-        EX_TOKID_WS_NEWLINE, 
+        EX_TOKID_WS_NEWLINE,
+        EX_TOKID_WS_NEWLINE,
+        EX_TOKID_WS_NEWLINE,
 };
 
 
@@ -81,7 +83,31 @@ contains(
 }
 
 
-static int is_whitespace(char c)    { return contains(c, whitespace);       }
+static int
+contains_str(
+        const char *needle,
+        const char **heystack,
+        int *index)
+{
+        int i = 0;
+
+        while (*heystack) {
+                if (strncmp(needle, *heystack, strlen(*heystack)) == 0) {
+                        if (index) {
+                                *index = i;
+                                return 1;
+                        }
+                }
+
+                heystack += 1;
+                i += 1;
+        }
+
+        return 0;
+}
+
+
+static int is_whitespace_str(const char *c, int *index) { return contains_str(c, whitespace_str, index); }
 static int is_alpha(char c)         { return contains(c, alpha);            }
 static int is_numeric(char c)       { return contains(c, numeric);          }
 static int is_alpha_numeric(char c) { return is_alpha(c) || is_numeric(c);  }
@@ -310,31 +336,21 @@ parse_whitespace(
         const char *src)
 {
         const char *end = src;
-        int len, i, sub_id;
+        int len, sub_id;
+        int index = 0;
 
         assert(next);
         assert(src);
 
-        if (!is_whitespace(*src)) {
+        if (!is_whitespace_str(src, &index)) {
                 return 0;
         } 
 
-        while (*end == *src) {
-                end += 1;
-        }
-
+        end += strlen(whitespace_str[index]);
         len = end - src;
-
+        
         if(len) {
-                sub_id = 0;
-
-                for(i = 0; i < EX_ARR_COUNT(whitespace_sub_id); ++i) {
-                        if(*src == whitespace[i]) {
-                                sub_id = whitespace_sub_id[i];
-                                break;
-                        }
-                }
-
+                sub_id = whitespace_sub_id[index];
                 set_token(next, EX_TOKID_WHITESPACE, sub_id, 0, len);      
         }
 
@@ -379,8 +395,11 @@ expr_lexer_create(
         struct expr_lexer_create_desc *desc)
 {
         /* variables */
-        struct expr_token *start_token = calloc(sizeof(*start_token) * 1000, 1);
-        struct expr_token *token = &start_token[0];
+        struct expr_token *start_token = 0;
+        ex_varr_create(start_token, 1 << 24);
+
+        struct expr_token *token = start_token;
+
         const char *start = 0;
         const char *src = 0;
 
@@ -443,10 +462,11 @@ expr_lexer_create(
 
                 if(desc->skip_whitespace && token->id == EX_TOKID_WHITESPACE) {
                         set_token(token, EX_TOKID_NULL, 0, 0, 0);      
-                        token -= 1;
+                }
+                else {
+                        ex_varr_push(start_token, token);
                 }
 
-                token += 1;
                 src += consume;
         }
 
@@ -454,17 +474,17 @@ expr_lexer_create(
 }
 
 
-void
+int
 expr_lexer_destroy(
         struct expr_token *destroy)
 {
         assert(destroy);
 
         if(!destroy) {
-                return;
+                return 0;
         }
 
-        EXPR_VARR_DESTROY(destroy);
+        return expr_varray_destroy(destroy);
 }
 
 
