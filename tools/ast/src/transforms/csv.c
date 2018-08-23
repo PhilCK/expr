@@ -2,6 +2,7 @@
 #include <expr/ast.h>
 #include <expr/file.h>
 #include <expr/ast_node_csv.h>
+#include <expr/v_array.h>
 #include <expr/lexer.h>
 #include <stdlib.h>
 #include <string.h>
@@ -12,6 +13,7 @@
 
 static int
 parse_cell(
+        struct expr_ast_node *root,
         struct expr_ast_node *parent,
         struct expr_ast_node *last_cell,
         struct expr_ast_node **n,
@@ -20,7 +22,9 @@ parse_cell(
         const char *delim,
         int delim_len)
 {
-        struct expr_ast_node *cn = *n;
+        struct expr_ast_node *cn = 0;
+        ex_varr_push(root, cn);
+
         struct expr_token *ct = *t;
         int len = 0;
         
@@ -58,20 +62,22 @@ parse_cell(
                 &src[(*t)->src_offset]);
 
         if(last_cell) {
-                last_cell->next = &cn[0];
+                last_cell->next = cn;
         }
         else {
-                parent->l_param = &cn[0];
+                parent->l_param = cn;
         }
 
-        cn[0].id = EX_AST_CSV_CELL;
-        cn[0].sub_id = EX_AST_CSV_CELL_STR; 
-        cn[0].parent = parent;
-        cn[0].l_param = 0;
-        cn[0].r_param = 0;
-        cn[0].src_offset = (*t)->src_offset;
-        cn[0].src_len = len;
-        cn[0].next = 0;
+        cn->id         = EX_AST_CSV_CELL;
+        cn->sub_id     = EX_AST_CSV_CELL_STR;
+        cn->parent     = parent;
+        cn->l_param    = 0;
+        cn->r_param    = 0;
+        cn->src_offset = (*t)->src_offset;
+        cn->src_len    = len;
+        cn->next       = 0;
+
+        *n = cn;
 
         int consumed = (ct - *t);
         *t += (ct - *t);
@@ -82,49 +88,45 @@ parse_cell(
 
 static int
 parse_rows(
-        struct expr_ast_node *n,
+        struct expr_ast_node *root_node,
         struct expr_token *t,
         const char *src,
         const char *delim)
 {
-        struct expr_ast_node *cn = n;
         struct expr_ast_node *lr = 0;
         struct expr_token *ct = t;
 
         int delim_len = strlen(delim);
 
-        cn += 1;
+        struct expr_ast_node *cn;
+        ex_varr_push(root_node, cn);
 
         /* each row */
         while(ct->id != EX_TOKID_NULL) {
                 printf("parse row %d %d %d - %.*s\n", ct->id, ct->src_len, ct->src_offset, ct->src_len, &src[ct->src_offset]);
 
                 /* add new row and cell */
-                cn[0].id          = EX_AST_CSV_ROW;
-                cn[0].sub_id      = EX_AST_CSV_ROW_CONTENT;
-                cn[0].parent      = n;
-                cn[0].l_param     = 0;
-                cn[0].r_param     = 0;
-                cn[0].next        = 0;
-                cn[0].src_offset  = 0;
-                cn[0].src_len     = 0;
+                cn->id          = EX_AST_CSV_ROW;
+                cn->sub_id      = EX_AST_CSV_ROW_CONTENT;
+                cn->parent      = root_node;
+                cn->l_param     = 0;
+                cn->r_param     = 0;
+                cn->next        = 0;
+                cn->src_offset  = 0;
+                cn->src_len     = 0;
 
                 if(lr) {
-                        lr->next = &cn[0];
+                        lr->next = cn;
                 }                
 
                 lr = cn;
-
-                cn += 1;
-
 
                 struct expr_ast_node *lc = 0;
 
                 /* cells */
                 while(ct->sub_id != EX_TOKID_WS_NEWLINE && ct->id != EX_TOKID_NULL) {
-                        int consume = parse_cell(lr, lc, &cn, &ct, src, delim, delim_len);
+                        int consume = parse_cell(root_node, lr, lc, &cn, &ct, src, delim, delim_len);
                         lc = cn;
-                        cn += 1;
 
                         if(!consume) {
                                 break;
@@ -193,8 +195,11 @@ struct expr_ast_node*
 expr_tokens_to_csv_ast(
         struct expr_ast_csv_create_desc *desc)
 {
-        struct expr_ast_node *root_node = malloc(sizeof(root_node[0]) * 1000);
-        struct expr_ast_node *node = &root_node[0];
+        struct expr_ast_node *root_node = 0;
+        ex_varr_create(root_node, 1 << 24);
+
+        struct expr_ast_node *node = 0;
+        ex_varr_push(root_node, node);
         
         root_node[0].id = EX_AST_CSV_DOC; 
         root_node[0].sub_id = 0;
