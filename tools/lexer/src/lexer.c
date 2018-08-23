@@ -7,7 +7,7 @@
 #include <stdio.h>
 
 
-/* ------------------------------------------------------------ [ Tables ] -- */
+/* -------------------------------------------------------------- Tables ---- */
 
 
 static const char whitespace[] = {
@@ -21,7 +21,7 @@ static int whitespace_sub_id[] = {
         EX_TOKID_WS_SPACE,
         EX_TOKID_WS_TAB,
         EX_TOKID_WS_NEWLINE,
-        EX_TOKID_WS_NEWLINE, 
+        EX_TOKID_WS_NEWLINE,
 };
 
 
@@ -61,7 +61,7 @@ static const char str_literal[] = {
 };
 
 
-/* ----------------------------------------------------------- [ Helpers ] -- */
+/* ------------------------------------------------------------- Helpers ---- */
 
 
 static int
@@ -98,7 +98,7 @@ set_token(struct expr_token *tok, int id, int sub_id, int offset, int len) {
 }
 
 
-/* ----------------------------------------------------------- [ Parsers ] -- */
+/* ------------------------------------------------------------- Parsers ---- */
 
 
 static int
