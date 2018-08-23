@@ -100,7 +100,6 @@ parse_rows(
 
         struct expr_ast_node *curr_row = 0;
         
-
         /* each row */
         while(ct->id != EX_TOKID_NULL) {
                 struct expr_ast_node *last_cell = 0;
