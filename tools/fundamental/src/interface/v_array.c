@@ -91,9 +91,11 @@ expr_varray_push(void *arr)
                         PAGE_EXECUTE_READWRITE);
         }
 
+        void *addr = (void*)header->curr;
+
         header->curr += header->stride;
 
-        return (void*)header->curr;
+        return addr;
 }
 
 #endif
