@@ -9,9 +9,8 @@
 
 --------------------------------------------------------------------- Globals --
 
-
+solution_name = path.getrelative(path.getabsolute("../"), path.getabsolute("./"))
 out_dir = "./build"
-solution_name = "Expression"
 debug_print = false -- if set to true, dumps out alot of dialog to inspect --
 default_lang = "C-ANSI"
 
@@ -500,3 +499,4 @@ print("</process premake>")
 -- [ end ] --
 
 print("</preamke>")
+
