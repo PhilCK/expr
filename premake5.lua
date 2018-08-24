@@ -417,6 +417,10 @@ for i, proj in ipairs(projects) do
     project(proj.name)
     kind(proj.kind)
 
+    if(proj.targetname) then
+        targetname(proj.targetname)
+    end
+
     if(os.target() == "windows" and proj.kind == "WindowedApp") then
         linkoptions({"/ENTRY:\"mainCRTStartup\""})
     end

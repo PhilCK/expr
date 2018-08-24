@@ -1,9 +1,10 @@
 {
         "projects": [
                 {
-                        "name": "lexer",
+                        "name": "lexer-lib",
                         "kind": "StaticLib",
                         "language": "C-ANSI",
+                        "targetname": "lexer",
 
                         "files": [
                                 "./include/**.h",
@@ -16,12 +17,13 @@
                         ],
 
                         "dependencies": [
-                                "fundamental"
+                                "fundamental-lib"
                         ]
                 },
                 {
-                        "name": "expr_lex",
+                        "name": "lexer-exe",
                         "kind": "ConsoleApp",
+                        "targetname": "expr_lex",
 
                         "files": [
                                 "./standalone/**.h",
@@ -29,7 +31,7 @@
                         ],
 
                         "dependencies": [
-                                "lexer"
+                                "lexer-lib"
                         ]
                 }
         ]

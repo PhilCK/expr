@@ -1,9 +1,10 @@
 {
         "projects": [
                 {
-                        "name": "ast",
+                        "name": "ast-lib",
                         "kind": "StaticLib",
                         "language": "C-ANSI",
+                        "targetname": "ast",
 
                         "files": [
                                 "./include/**.h",
@@ -20,13 +21,14 @@
                         ],
 
                         "dependencies": [
-                                "lexer",
-                                "fundamental"
+                                "lexer-lib",
+                                "fundamental-lib"
                         ]
                 },
                 {
-                        "name": "expr_ast",
+                        "name": "ast-exe",
                         "kind": "ConsoleApp",
+                        "targetname": "expr_ast",
 
                         "files": [
                                 "./standalone/**.h",
@@ -34,8 +36,8 @@
                         ],
 
                         "dependencies": [
-                                "ast",
-                                "lexer"
+                                "ast-lib",
+                                "lexer-lib"
                         ]
                 }
         ]

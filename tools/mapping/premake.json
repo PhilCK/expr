@@ -1,9 +1,10 @@
 {
         "projects": [
                 {
-                        "name": "mapping",
+                        "name": "mapping-lib",
                         "kind": "StaticLib",
                         "language": "C-ANSI",
+                        "targetname": "mapping",
 
                         "files": [
                                 "./include/**.h",
@@ -16,13 +17,14 @@
                         ],
 
                         "dependencies": [
-                                "fundamental",
-                                "lexer"
+                                "fundamental-lib",
+                                "lexer-lib"
                         ]
                 },
                 {
-                        "name": "expr_map",
+                        "name": "mapping-exe",
                         "kind": "ConsoleApp",
+                        "targetname": "expr_map",
 
                         "files": [
                                 "./standalone/**.h",
@@ -30,7 +32,7 @@
                         ],
 
                         "dependencies": [
-                                "mapping"
+                                "mapping-lib"
                         ]
                 }
         ]

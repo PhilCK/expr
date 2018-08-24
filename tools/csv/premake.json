@@ -1,9 +1,10 @@
 {
         "projects": [
                 {
-                        "name": "csv",
+                        "name": "csv-lib",
                         "kind": "StaticLib",
                         "language": "C-ANSI",
+                        "targetname": "csv",
 
                         "files": [
                                 "./include/**.h",
@@ -16,14 +17,15 @@
                         ],
 
                         "dependencies": [
-                                "fundamental",
-                                "lexer",
-                                "ast"
+                                "fundamental-lib",
+                                "lexer-lib",
+                                "ast-lib"
                         ]
                 },
                 {
-                        "name": "expr_csv",
+                        "name": "csv-exe",
                         "kind": "ConsoleApp",
+                        "targetname": "expr_csv",
 
                         "files": [
                                 "./standalone/**.h",
@@ -31,7 +33,7 @@
                         ],
 
                         "dependencies": [
-                                "csv"
+                                "csv-lib"
                         ]
                 }
         ]
