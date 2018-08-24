@@ -15,6 +15,12 @@ enum expr_csv_identifiers {
 /* -------------------------------------------------------------- Lifetime -- */
 
 
+enum expr_csv_source {
+        EXPR_CSV_SOURCE_FILE,
+        EXPR_CSV_SOURCE_STRING,
+};
+
+
 struct expr_csv_import_desc {
         int type_id;
         void *ext;
@@ -35,7 +41,7 @@ expr_csv_destroy(
         struct expr_csv_data **csv);
 
 
-/* ------------------------------------------------------------------ Data -- */
+/* ------------------------------------------------------------- Integrity -- */
 
 
 struct expr_csv_check_desc {
@@ -54,7 +60,7 @@ enum expr_csv_integrity_flags {
 
 struct expr_csv_integrity {
         int has_header_row;
-        int has_integrity;
+        int integrity;
 
         int row_count;
         int col_count;
@@ -65,6 +71,9 @@ int
 expr_csv_check(
         struct expr_csv_check_desc *desc,
         struct expr_csv_integrity *out_desc);
+
+
+/* ------------------------------------------------------------------ Data -- */
 
 
 enum expr_csv_fetch_selectors {
@@ -86,7 +95,7 @@ struct expr_csv_fetch_data_desc {
 
 int
 expr_csv_fetch_data(
-        struct expr_csv_fetch_data *desc,
+        struct expr_csv_fetch_data_desc *desc,
         void **data,
         int *types,
         int *count);

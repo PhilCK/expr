@@ -2,12 +2,14 @@
 #include <expr/ast.h>
 #include <expr/ast_node_csv.h>
 #include <expr/lexer.h>
+#include <expr/fundamental.h>
 #include <assert.h>
+#include <stdlib.h>
 
 
 struct expr_csv_data {
         const char *src;
-        struct expr_ast *ast;
+        struct expr_ast_node *ast;
 };
 
 
@@ -27,13 +29,64 @@ expr_csv_create(
                 return 0;
         }
 
+        const char *src = 0;
+
+        if(desc->source == EXPR_CSV_SOURCE_FILE) {
+                int bytes = 0;
+                int load = 0;
+                load = expr_file_load(desc->source, 0, &bytes);
+
+                if(!load) {
+                        return 0;
+                }
+                
+                src = calloc(bytes, 1);
+                load = expr_file_load(desc->data, &src, 0);
+
+                if(!load) {
+                        free((void*)src);
+                        src = 0;
+                        return 0;
+                }
+
+        } else if(desc->source == EXPR_CSV_SOURCE_STRING) {
+                src = desc->data;
+        }
+        else {
+                return 0;
+        }
+
         /* load tokens */
-        struct expr_token *toks = 0;
+        struct expr_lexer_create_desc lex_desc = {0};
+        lex_desc.type_id = EX_LEX_TYPEID_CREATE;
+        lex_desc.src = src;
+        lex_desc.skip_whitespace = 0;
+
+        struct expr_token *toks = expr_lexer_create(&lex_desc);
+
+        if(!toks) {
+                return 0;
+        }
 
         /* load csv ast */
-        struct expr_ast *ast = 0;
+        struct expr_ast_create_desc ast_desc = {0};
+        ast_desc.type_id = EX_AST_TYPEID_CREATE;
+        ast_desc.token_streams = &toks;
+        ast_desc.src_streams = &src;
+        ast_desc.stream_count = 1;
 
-        return 0;
+        struct expr_ast_node *ast = expr_ast_create(&ast_desc);
+
+        expr_ast_print(ast, src);
+
+        if(!ast) {
+                return 0;
+        }
+
+        /* create data ctx */
+
+
+        return 1;
 }
 
 int

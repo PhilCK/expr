@@ -1,5 +1,4 @@
 #include <expr/lexer.h>
-#include <expr/fundamental.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>

@@ -1,13 +1,17 @@
 #include <expr/v_array.h>
+#include <assert.h>
 
 #ifdef __linux__
 #define _GNU_SOURCE
+#define _BSD_SOURCE
 #include <sys/mman.h>
 
-#error "incomplete"
 
 struct varray_header {
-        void *addr;
+        char *addr;
+        char *curr;
+        int length;
+        int stride;
 };
 
 
@@ -21,9 +25,37 @@ expr_varray_create(int bytes_of_item, int count)
         void *addr = mmap(0, length, prot, flags, 0, 0);
 
         struct varray_header *header = (struct varray_header*)addr;
-        header->addr = addr;
+        header->addr = (char*)addr;
+        header->curr = header->addr + sizeof(*header);
+        header->length = length;
+        header->stride = bytes_of_item;
 
-        return &header[1];
+        return (void*)header->curr;
+}
+
+
+int
+expr_varray_destroy(void *arr)
+{
+        assert(arr);
+
+        struct varray_header *header = (struct varray_header*)arr;
+
+        return (munmap((void*)header->addr, header->length) == 0) ? 1 : 0;
+}
+
+
+void *
+expr_varray_push(void *arr)
+{
+        assert(arr);
+
+        struct varray_header *header = (struct varray_header*)arr;
+
+        void *addr = (void*)header->curr;
+        header->curr += header->stride;
+
+        return addr;
 }
 
 
@@ -111,5 +143,8 @@ expr_varray_push(void *arr)
 
         return addr;
 }
+
+#undef _GNU_SOURCE
+#undef _BSD_SOURCE
 
 #endif

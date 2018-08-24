@@ -4,6 +4,7 @@
                         "name": "fundamental-lib",
                         "kind": "StaticLib",
                         "targetname": "fundamental",
+                        "language": "C",
 
                         "files": [
                                 "./include/**.h",

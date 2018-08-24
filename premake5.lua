@@ -23,6 +23,10 @@ elseif os.target() == "macosx" then
     compiler = "clang"
 end
 
+-- shuold stop link order issues from happening --
+if compiler == "clang" or compiler == "gcc" then
+    linkgroups('On')
+end
 
 --------------------------------------------------------------------- Helpers --
 
