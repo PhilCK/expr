@@ -372,29 +372,27 @@ end
 local configs = {
     {
         name = "Development",
-        symbols = true,
-        simd = false,
-        fast_float = true,
-        extra_warnings = true,
-        warnings_as_errors = false,
+        symbols = "On",
+        optimize = "Off",
+        simd = "SSE2",
+        fast_float = "Fast",
+        warnings_as_errors = "",
     },
     {
         name = "Staging",
-        symbols = true,
-        simd = true,
-        optimize = true,
-        fast_float = true,
-        extra_warnings = true,
-        warnings_as_errors = true,
+        symbols = "On",
+        simd = "SSE2",
+        optimize = "On",
+        fast_float = "Fast",
+        warnings_as_errors = "FatalWarnings",
     },
     {
         name = "Release",
-        symbols = false,
-        simd = true,
-        optimize = true,
-        fast_float = true,
-        extra_warnings = true,
-        warnings_as_errors = true,
+        symbols = "Off",
+        simd = "SSE2",
+        optimize = "Full",
+        fast_float = "Fast",
+        warnings_as_errors = "FatalWarnings",
 
         defines = {"NDEBUG"}
     },
@@ -491,6 +489,19 @@ for i, proj in ipairs(projects) do
     end
 
     defines(proj_defines)
+
+    -- Configs --
+
+    for j, config in ipairs(configs) do
+            configuration(config.name)
+            symbols(config.symbols)
+            defines(config.defines)
+            warnings("Extra")
+            vectorextensions(config.simd)
+            optimize(config.optimize)
+            floatingpoint(config.fast_float)
+
+    end
 
 end
 print("</process premake>")

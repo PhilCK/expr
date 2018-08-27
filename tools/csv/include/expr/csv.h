@@ -93,11 +93,17 @@ struct expr_csv_fetch_data_desc {
 };
 
 
+struct expr_csv_data_cell {
+        int data_type;
+        const char *src;
+        int src_len;
+};
+
+
 int
 expr_csv_fetch_data(
         struct expr_csv_fetch_data_desc *desc,
-        void **data,
-        int *types,
+        struct expr_csv_data_cell *cells,
         int *count);
 
 

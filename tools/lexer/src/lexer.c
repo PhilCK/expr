@@ -398,7 +398,8 @@ expr_lexer_create(
         struct expr_token *start_token = 0;
         ex_varr_create(start_token, 1 << 24);
 
-        struct expr_token *token = start_token;
+        struct expr_token *token = 0;
+        ex_varr_push(start_token, token);
 
         const char *start = 0;
         const char *src = 0;

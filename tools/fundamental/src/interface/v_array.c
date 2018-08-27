@@ -40,6 +40,7 @@ expr_varray_destroy(void *arr)
         assert(arr);
 
         struct varray_header *header = (struct varray_header*)arr;
+        header -= 1;
 
         return (munmap((void*)header->addr, header->length) == 0) ? 1 : 0;
 }
@@ -51,6 +52,7 @@ expr_varray_push(void *arr)
         assert(arr);
 
         struct varray_header *header = (struct varray_header*)arr;
+        header -= 1; /* header is before the array */
 
         void *addr = (void*)header->curr;
         header->curr += header->stride;
@@ -116,6 +118,7 @@ expr_varray_destroy(void *arr)
         }
 
         struct varray_header *header = (struct varray_header*)arr;
+        header -= 1;
 
         return VirtualFree(header->addr, 0, MEM_RELEASE);
 }

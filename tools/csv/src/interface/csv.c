@@ -84,7 +84,17 @@ expr_csv_create(
         }
 
         /* create data ctx */
+        struct expr_csv_data *data = malloc(sizeof(*data));
 
+        if(!data) {
+                return 0;
+        }
+
+        data->src = src;
+        data->ast = ast;
+
+        *csv = data;
+        expr_lexer_destroy(toks);
 
         return 1;
 }
@@ -126,10 +136,12 @@ expr_csv_check(
 int
 expr_csv_fetch_data(
         struct expr_csv_fetch_data_desc *desc,
-        void **data,
-        int *types,
+        struct expr_csv_data_cell *cells,
         int *count)
 {
+        struct expr_csv_data *csv = 0;
+        struct expr_ast_node *ast = 0;
+
         assert(desc);
         assert(desc->type_id == EXPR_CSV_STRUCT_FETCH);
         assert(desc->csv);
@@ -138,6 +150,19 @@ expr_csv_fetch_data(
                 return 0;
         }
 
+        csv = desc->csv;
+        ast = csv->ast;
 
+        /* count */
+        /*
+         *  if rows we are counting columns on the selector's row.
+         *
+         *  once we find said row we output it.
+         *
+         *  if cols we are counting rows that contain enough selector data
+         *
+         *  once we find said column we output it.
+         * /
+        
         return 0;
 }
