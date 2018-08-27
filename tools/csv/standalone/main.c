@@ -13,7 +13,7 @@ static const char *file = 0;
 int
 main()
 {
-        const char *file = "some csv";
+        const char *file = "C:/Users/SimStim/Developer/expr/tools/lexer/test_data/csv/no_header.csv";
 
         struct expr_csv_data *data = 0;
 
@@ -34,21 +34,21 @@ main()
         }
 
         /* check integrity */
-        struct expr_csv_check_desc integ_desc = {0};
-        integ_desc.type_id = EXPR_CSV_STRUCT_CHECK;
-        integ_desc.csv = data;
+        //struct expr_csv_check_desc integ_desc = {0};
+        //integ_desc.type_id = EXPR_CSV_STRUCT_CHECK;
+        //integ_desc.csv = data;
 
-        struct expr_csv_integrity integ = {0};
+        //struct expr_csv_integrity integ = {0};
 
-        success = expr_csv_check(&integ_desc, &integ);
+        //success = expr_csv_check(&integ_desc, &integ);
 
-        if(!success) {
-                printf("CSV Failed to check integrity\n");
-        }
+        //if(!success) {
+        //        printf("CSV Failed to check integrity\n");
+        //}
 
-        if(!(integ.integrity & EXPR_CSV_HAS_UNIFORM_COLUMN_COUNT)) {
-                printf("CSV Columns aren't consistant\n");
-        }
+        //if(!(integ.integrity & EXPR_CSV_HAS_UNIFORM_COLUMN_COUNT)) {
+        //        printf("CSV Columns aren't consistant\n");
+        //}
 
         /* get data */
         struct expr_csv_fetch_data_desc data_desc = {0};
@@ -58,7 +58,10 @@ main()
         data_desc.csv = data;
 
         int count = 0;
-        success = expr_csv_fetch_data(&data_desc, 0, 0, &count); 
+        success = expr_csv_fetch_data(&data_desc, 0, 0, &count);
+
+        int *types = malloc(sizeof(int) * count);
+        expr_csv_fetch_data(&data_desc, 0, types, 0);
 
         return 0;
 }

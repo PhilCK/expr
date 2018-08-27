@@ -23,9 +23,9 @@ expr_csv_create(
 {
         assert(desc);
         assert(desc->type_id == EXPR_CSV_STRUCT_IMPORT);
-        assert(desc->source);
+        assert(desc->data);
 
-        if (!desc || desc->type_id != EXPR_CSV_STRUCT_IMPORT || !desc->source) {
+        if (!desc || desc->type_id != EXPR_CSV_STRUCT_IMPORT || !desc->data) {
                 return 0;
         }
 
@@ -34,7 +34,7 @@ expr_csv_create(
         if(desc->source == EXPR_CSV_SOURCE_FILE) {
                 int bytes = 0;
                 int load = 0;
-                load = expr_file_load(desc->source, 0, &bytes);
+                load = expr_file_load(desc->data, 0, &bytes);
 
                 if(!load) {
                         return 0;
@@ -137,6 +137,7 @@ expr_csv_fetch_data(
         if (!desc || desc->type_id != EXPR_CSV_STRUCT_FETCH || !desc->csv) {
                 return 0;
         }
+
 
         return 0;
 }

@@ -35,6 +35,7 @@ parse_cell(
                 int is_str = strncmp(&src[ct->src_offset], delim, delim_len);
                 
                 if(is_len == 1 && is_str == 0) {
+                        len += ct->src_len;
                         ct += 1;
                         break;
                 }
