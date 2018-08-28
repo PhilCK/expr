@@ -48,5 +48,8 @@ expr_ast_print(
         struct expr_ast_node *root,
         const char *src)
 {
+        (void)root;
+        (void)src;
+
         return 0;
 }

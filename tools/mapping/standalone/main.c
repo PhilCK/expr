@@ -8,6 +8,9 @@
 int
 main(int argc, char **argv)
 {
+        (void)argc;
+        (void)argv;
+
         int count = 0;
         int i;
         struct expr_sub_punctuation *map = 0;

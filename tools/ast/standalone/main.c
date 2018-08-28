@@ -137,7 +137,7 @@ main(int argc, char **argv) {
         }
 
         /* load src file */
-        unsigned bytes = 0;
+        int bytes = 0;
         if(!expr_file_load(src_file, 0, &bytes)) {
                 printf("Failed to load src file %s\n", src_file);
                 return 0;

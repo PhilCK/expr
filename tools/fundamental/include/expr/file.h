@@ -12,7 +12,7 @@ int
 expr_file_load(
         const char *filename,
         const char **memory,
-        unsigned *bytes);
+        int *bytes);
 
 
 /* inc guard */

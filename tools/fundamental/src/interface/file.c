@@ -6,7 +6,7 @@ int
 expr_file_load(
         const char *filename,
         const char **memory,
-        unsigned *bytes)
+        int *bytes)
 {
         long length = 0;
 
@@ -24,7 +24,7 @@ expr_file_load(
         length = ftell(f);
         
         if(bytes) {
-                *bytes = (unsigned)length;
+                *bytes = (int)length;
         }
 
         /* not a fail, just return */

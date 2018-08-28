@@ -3,8 +3,12 @@
 #include <expr/ast_node_csv.h>
 #include <expr/lexer.h>
 #include <expr/fundamental.h>
+#include <expr/file.h>
 #include <assert.h>
 #include <stdlib.h>
+
+
+/* -------------------------------------------------------------- Internal -- */
 
 
 struct expr_csv_data {
@@ -21,23 +25,37 @@ expr_csv_create(
         struct expr_csv_import_desc *desc,
         struct expr_csv_data **csv)
 {
+        int is_src_file = -1;
+        int is_src_str = -1;
+        
         assert(desc);
         assert(desc->type_id == EXPR_CSV_STRUCT_IMPORT);
         assert(desc->data);
 
-        if (!desc || desc->type_id != EXPR_CSV_STRUCT_IMPORT || !desc->data) {
-                return 0;
+        if(!desc || !csv) {
+                return EXPR_CSV_INVALID_PARAM;
+        }
+
+        if(desc->type_id != EXPR_CSV_STRUCT_IMPORT || !desc->data) {
+                return EXPR_CSV_INVALID_DESC;
+        }
+
+        is_src_file = desc->source == EXPR_CSV_SOURCE_FILE;
+        is_src_str = desc->source == EXPR_CSV_SOURCE_STRING;
+        
+        if((is_src_file + is_src_str) <= 0) {
+               return EXPR_CSV_INVALID_DESC;
         }
 
         const char *src = 0;
 
-        if(desc->source == EXPR_CSV_SOURCE_FILE) {
+        if(is_src_file) {
                 int bytes = 0;
                 int load = 0;
                 load = expr_file_load(desc->data, 0, &bytes);
 
                 if(!load) {
-                        return 0;
+                        return EXPR_CSV_FAIL;
                 }
                 
                 src = calloc(bytes, 1);
@@ -46,14 +64,11 @@ expr_csv_create(
                 if(!load) {
                         free((void*)src);
                         src = 0;
-                        return 0;
+                        return EXPR_CSV_FAIL;
                 }
 
-        } else if(desc->source == EXPR_CSV_SOURCE_STRING) {
+        } else if(is_src_str) {
                 src = desc->data;
-        }
-        else {
-                return 0;
         }
 
         /* load tokens */
@@ -65,7 +80,9 @@ expr_csv_create(
         struct expr_token *toks = expr_lexer_create(&lex_desc);
 
         if(!toks) {
-                return 0;
+                expr_lexer_destroy(toks);
+                free((void*)src);
+                return EXPR_CSV_FAIL;
         }
 
         /* load csv ast */
@@ -77,17 +94,22 @@ expr_csv_create(
 
         struct expr_ast_node *ast = expr_ast_create(&ast_desc);
 
-        expr_ast_print(ast, src);
-
-        if(!ast) {
-                return 0;
+        if(!ast || ast->id != EX_AST_CSV_DOC) {
+                expr_ast_destroy(ast);
+                expr_lexer_destroy(toks);
+                free((void*)src);
+                return EXPR_CSV_FAIL;
         }
 
         /* create data ctx */
         struct expr_csv_data *data = malloc(sizeof(*data));
 
         if(!data) {
-                return 0;
+                expr_ast_destroy(ast);
+                expr_lexer_destroy(toks);
+                free((void*)src);
+
+                return EXPR_CSV_FAIL;
         }
 
         data->src = src;
@@ -96,7 +118,7 @@ expr_csv_create(
         *csv = data;
         expr_lexer_destroy(toks);
 
-        return 1;
+        return EXPR_CSV_OK;
 }
 
 int
@@ -107,10 +129,33 @@ expr_csv_destroy(
         assert(*csv);
 
         if (!csv || !*csv) {
-                return 0;
+                return EXPR_CSV_INVALID_PARAM;
         }
 
+        return EXPR_CSV_FAIL;
+}
+
+
+/* ---------------------------------------------------------- Data Helpers -- */
+
+
+int
+type_from_ast(struct expr_ast_node *node) {
+        /* do type stuff */
+        (void)node;
         return 0;
+}
+
+
+void
+cell_from_ast(
+        struct expr_ast_node *node,
+        struct expr_csv_data_cell *cell,
+        struct expr_csv_data *csv)
+{
+        cell->data_type = type_from_ast(node);
+        cell->src = &csv->src[node->src_offset];
+        cell->src_len = node->src_len;
 }
 
 
@@ -125,6 +170,7 @@ expr_csv_check(
         assert(desc);
         assert(desc->type_id == EXPR_CSV_STRUCT_CHECK);
         assert(desc->csv);
+        assert(out_desc);
 
         if (!desc || desc->type_id != EXPR_CSV_STRUCT_CHECK || !desc->csv) {
                 return 0;
@@ -133,36 +179,116 @@ expr_csv_check(
         return 0;
 }
 
+
 int
 expr_csv_fetch_data(
         struct expr_csv_fetch_data_desc *desc,
         struct expr_csv_data_cell *cells,
         int *count)
 {
+        int is_row_search = -1;
+        int is_col_search = -1;
+
         struct expr_csv_data *csv = 0;
         struct expr_ast_node *ast = 0;
 
         assert(desc);
         assert(desc->type_id == EXPR_CSV_STRUCT_FETCH);
         assert(desc->csv);
+
+        if(!desc) {
+                return EXPR_CSV_INVALID_PARAM;
+        }
         
-        if (!desc || desc->type_id != EXPR_CSV_STRUCT_FETCH || !desc->csv) {
-                return 0;
+        if (desc->type_id != EXPR_CSV_STRUCT_FETCH || !desc->csv) {
+                return EXPR_CSV_INVALID_DESC;
+        }
+
+        is_row_search = desc->fetch_type == EXPR_CSV_FETCH_ROW;
+        is_col_search = desc->fetch_type == EXPR_CSV_FETCH_COLUMN;
+
+        if((is_row_search + is_col_search) <= 0) {
+                return EXPR_CSV_INVALID_DESC;
         }
 
         csv = desc->csv;
         ast = csv->ast;
 
-        /* count */
-        /*
-         *  if rows we are counting columns on the selector's row.
-         *
-         *  once we find said row we output it.
-         *
-         *  if cols we are counting rows that contain enough selector data
-         *
-         *  once we find said column we output it.
-         * /
-        
-        return 0;
+        if(ast->id != EX_AST_CSV_DOC) {
+                assert(0);
+                return EXPR_CSV_FAIL;
+        }
+
+        if(is_row_search) { 
+                int i;
+                struct expr_ast_node *row = ast->l_param;
+                struct expr_ast_node *cell = 0;
+
+                i = 0;
+
+                while(row && i != desc->selection) {
+                        i += 1;
+                        row = row->next;
+                }
+
+                if(count) {
+                        i = 0;
+                        cell = row->l_param;
+
+                        while(cell) {
+                                cell = cell->next;
+                                i += 1;
+                        }
+
+                        *count = i;
+                }
+
+                if(cells) {
+                        i = 0;
+                        cell = row->l_param;
+
+                        while(cell) {
+                                cell_from_ast(cell, &cells[i], csv);
+
+                                cell = cell->next;
+                                i += 1;
+                        }
+                }
+
+        }
+        else if(is_col_search) {
+                int i, j;
+                struct expr_ast_node *row = ast->l_param;
+                struct expr_ast_node *cell = 0;
+
+                j = 0;
+
+                while(row) {
+                        i = 0;
+                        cell = row->l_param;
+
+                        while(cell) {
+                                if(i < desc->selection) {
+                                        i += 1;
+                                        cell = cell->next;
+                                        continue;
+                                }
+
+                                if(cells) {
+                                        cell_from_ast(cell, &cells[j], csv);
+                                }
+                                
+                                j += 1;
+                                cell = 0;
+                        };
+
+                        row = row->next;
+                }
+
+                if(count) {
+                        *count = j;
+                }
+        }
+
+        return EXPR_CSV_OK;
 }

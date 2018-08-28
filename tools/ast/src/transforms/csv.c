@@ -9,6 +9,32 @@
 #include <string.h>
 
 
+/* --------------------------------------------------------- AST to String -- */
+
+
+const char *expr_ast_node_csv_names[EX_AST_CSV_COUNT] = {
+        "EX_AST_CSV_NULL"
+          ,
+        "EX_AST_CSV_DOC",
+
+        "EX_AST_CSV_ROW",
+        "EX_AST_CSV_ROW_HEADER",
+        "EX_AST_CSV_ROW_CONTENT",
+
+        "EX_AST_CSV_CELL",
+        "EX_AST_CSV_CELL_STR",
+        "EX_AST_CSV_CELL_INT",
+        "EX_AST_CSV_CELL_INT2",
+        "EX_AST_CSV_CELL_INT3",
+        "EX_AST_CSV_CELL_INT4",
+        "EX_AST_CSV_CELL_FLOAT",
+        "EX_AST_CSV_CELL_FLOAT2",
+        "EX_AST_CSV_CELL_FLOAT3",
+        "EX_AST_CSV_CELL_FLOAT4",
+        "EX_AST_CSV_CELL_BOOL",
+};
+
+
 /* -------------------------------------------------------------- Helpers  -- */
 
 
@@ -35,7 +61,6 @@ parse_cell(
                 int is_str = strncmp(&src[ct->src_offset], delim, delim_len);
                 
                 if(is_len == 1 && is_str == 0) {
-                        len += ct->src_len;
                         ct += 1;
                         break;
                 }
@@ -130,8 +155,6 @@ parse_rows(
 
                 last_row = curr_row;
 
-                struct expr_ast_node *lc = 0;
-
                 /* cells */
                 while(ct->sub_id != EX_TOKID_WS_NEWLINE && ct->id != EX_TOKID_NULL) {
                         
@@ -220,8 +243,6 @@ expr_tokens_to_csv_ast(
         node->src_len = strlen(desc->src);
 
         parse_rows(root_node, desc->tokens, desc->src, desc->delim);
-
-        expr_ast_csv_print(root_node, desc->src, 0);
 
         return root_node;
 }

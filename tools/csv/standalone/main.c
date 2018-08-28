@@ -10,6 +10,12 @@
 static const char *file = 0;
 
 
+/* -------------------------------------------------------------- Cmd Args -- */
+
+
+/* todo */
+
+
 /* ----------------------------------------------------------- Application -- */
 
 
@@ -24,7 +30,7 @@ main()
 
         struct expr_csv_data *data = 0;
 
-        int success = 0;
+        int err = 0;
 
         /* get csv */
         struct expr_csv_import_desc import_desc = {0};
@@ -33,11 +39,14 @@ main()
         import_desc.data = file;
         import_desc.delimiter = ",";
         
-        success = expr_csv_create(&import_desc, &data);
+        err = expr_csv_create(&import_desc, &data);
 
-        if(!success) {
+        if(err != EXPR_CSV_OK) {
                 printf("Failed to import CSV\n");
                 return 0;
+        }
+        else {
+                printf("Loaded CSV\n");
         }
 
         /* check integrity */
@@ -61,15 +70,15 @@ main()
         /* get data */
         struct expr_csv_fetch_data_desc data_desc = {0};
         data_desc.type_id = EXPR_CSV_STRUCT_FETCH;
-        data_desc.fetch_type = EXPR_CSV_FETCH_ROW;
-        data_desc.selection = 0;
+        data_desc.fetch_type = EXPR_CSV_FETCH_COLUMN;
+        data_desc.selection = 2;
         data_desc.csv = data;
 
         int count = 0;
 
-        success = expr_csv_fetch_data(&data_desc, 0, &count);
+        err = expr_csv_fetch_data(&data_desc, 0, &count);
 
-        if(!success) {
+        if(err!= EXPR_CSV_OK) {
                 printf("Failed to get cell count\n");
                 return 0;
         } else {
@@ -78,14 +87,16 @@ main()
 
         struct expr_csv_data_cell *cells = malloc(sizeof(cells[0]) * count);
 
-        success = expr_csv_fetch_data(&data_desc, cells, 0);
+        err = expr_csv_fetch_data(&data_desc, cells, 0);
 
-        if(!success) {
+        if(err != EXPR_CSV_OK) {
                 printf("Failed to get cell data\n");
         }
 
         int i;
         for(i = 0; i < count; ++i) {
-                printf("%.*s\n", cells[i].src_len, &cells[i].src);
+                printf("%d: %.*s\n", i + 1, cells[i].src_len, cells[i].src);
         }
+
+        return 0;
 }
