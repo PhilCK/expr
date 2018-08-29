@@ -8,6 +8,10 @@
 #include <stdlib.h>
 
 
+#define DEBUG_PRINT_TOKENS 1
+
+
+
 /* -------------------------------------------------------------- Internal -- */
 
 
@@ -85,6 +89,10 @@ expr_csv_create(
                 return EXPR_CSV_FAIL;
         }
 
+        if(DEBUG_PRINT_TOKENS) {
+                expr_lexer_print(toks, src);
+        }
+
         /* load csv ast */
         struct expr_ast_create_desc ast_desc = {0};
         ast_desc.type_id = EX_AST_TYPEID_CREATE;
@@ -141,9 +149,23 @@ expr_csv_destroy(
 
 int
 type_from_ast(struct expr_ast_node *node) {
-        /* do type stuff */
-        (void)node;
-        return 0;
+        switch(node->sub_id) {
+        case(EX_AST_CSV_CELL_STR): return EXPR_CSV_CELL_TYPE_STR;
+        case(EX_AST_CSV_CELL_INT): return EXPR_CSV_CELL_TYPE_INT;
+        case(EX_AST_CSV_CELL_INT2): return EXPR_CSV_CELL_TYPE_INT2;
+        case(EX_AST_CSV_CELL_INT3): return EXPR_CSV_CELL_TYPE_INT3;
+        case(EX_AST_CSV_CELL_INT4): return EXPR_CSV_CELL_TYPE_INT3;
+        case(EX_AST_CSV_CELL_FLOAT): return EXPR_CSV_CELL_TYPE_FLOAT;
+        case(EX_AST_CSV_CELL_FLOAT2): return EXPR_CSV_CELL_TYPE_FLOAT2;
+        case(EX_AST_CSV_CELL_FLOAT3): return EXPR_CSV_CELL_TYPE_FLOAT3;
+        case(EX_AST_CSV_CELL_FLOAT4): return EXPR_CSV_CELL_TYPE_FLOAT4;
+        case(EX_AST_CSV_CELL_BOOL): return EXPR_CSV_CELL_TYPE_BOOL;
+        case(EX_AST_CSV_CELL_BOOL2): return EXPR_CSV_CELL_TYPE_BOOL2;
+        case(EX_AST_CSV_CELL_BOOL3): return EXPR_CSV_CELL_TYPE_BOOL3;
+        case(EX_AST_CSV_CELL_BOOL4): return EXPR_CSV_CELL_TYPE_BOOL4;
+        }
+
+        return EXPR_CSV_CELL_TYPE_STR;
 }
 
 

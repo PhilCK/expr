@@ -7,7 +7,28 @@
 #include <stdio.h>
 
 
-/* ------------------------------------------------------------ [ Tables ] -- */
+/* ------------------------------------------------------- Token to String -- */
+
+
+const char *expr_tokid_names[EX_TOKID_COUNT] = {
+        "EX_TOKID_NULL",
+        "EX_TOKID_UNKNOWN",
+        "EX_TOKID_LITERAL",
+        "EX_TOKID_WHITESPACE",
+        "EX_TOKID_IDENT",
+        "EX_TOKID_PUNCT",
+        "EX_TOKID_WS_SPACE",
+        "EX_TOKID_WS_TAB",
+        "EX_TOKID_WS_NEWLINE",
+        "EX_TOKID_LIT_NUM",
+        "EX_TOKID_LIT_HEX",
+        "EX_TOKID_LIT_BIN",
+        "EX_TOKID_LIT_FLT",
+        "EX_TOKID_LIT_STR"
+};
+
+
+/* ---------------------------------------------------------------- Tables -- */
 
 
 static const char *whitespace_str[] = {
@@ -63,7 +84,7 @@ static const char str_literal[] = {
 };
 
 
-/* ----------------------------------------------------------- [ Helpers ] -- */
+/* --------------------------------------------------------------- Helpers -- */
 
 
 static int
@@ -124,7 +145,7 @@ set_token(struct expr_token *tok, int id, int sub_id, int offset, int len) {
 }
 
 
-/* ----------------------------------------------------------- [ Parsers ] -- */
+/* --------------------------------------------------------------- Parsers -- */
 
 
 static int
@@ -232,7 +253,11 @@ parse_flt_literal(
 
                 end += 1;
         }
-        
+
+        if(decimal == 0) {
+                return 0;
+        }
+       
         len = end - src;
 
         if(!len) {
@@ -351,7 +376,7 @@ parse_whitespace(
         
         if(len) {
                 sub_id = whitespace_sub_id[index];
-                set_token(next, EX_TOKID_WHITESPACE, sub_id, 0, len);      
+                set_token(next, EX_TOKID_WHITESPACE, sub_id, 0, len);
         }
 
         return len;
@@ -507,10 +532,10 @@ expr_lexer_print(
 
         if(src) {
                 while(t->id != EX_TOKID_NULL) {
-                        printf("%d tok: (%d|%d) - [%.*s]\n",
+                        printf("%d tok: (%s|%s) - [%.*s]\n",
                                 (int)(t - toks),
-                                t->id,
-                                t->sub_id,
+                                expr_tokid_names[t->id],
+                                expr_tokid_names[t->sub_id],
                                 t->src_len,
                                 &src[t->src_offset]);
 
@@ -519,10 +544,10 @@ expr_lexer_print(
         }
         else {
                 while(t->id != EX_TOKID_NULL) {
-                        printf("%d tok: (%d|%d) - [%d|%d]\n",
+                        printf("%d tok: (%s|%s) - [%d|%d]\n",
                                 (int)(t - toks),
-                                t->id,
-                                t->sub_id,
+                                expr_tokid_names[t->id],
+                                expr_tokid_names[t->sub_id],
                                 t->src_offset,
                                 t->src_len);
 

@@ -71,7 +71,7 @@ main()
         struct expr_csv_fetch_data_desc data_desc = {0};
         data_desc.type_id = EXPR_CSV_STRUCT_FETCH;
         data_desc.fetch_type = EXPR_CSV_FETCH_COLUMN;
-        data_desc.selection = 2;
+        data_desc.selection = 4;
         data_desc.csv = data;
 
         int count = 0;
@@ -94,8 +94,24 @@ main()
         }
 
         int i;
+
+        const char *type_names[] = {
+                "STR", "INT", "INT2", "INT3", "INT4",
+                "FLT", "FLT2", "FLT3", "FLT4", "BOOL",
+                "BOOL2", "BOOL3", "BOOL4",
+        };
+
         for(i = 0; i < count; ++i) {
-                printf("%d: %.*s\n", i + 1, cells[i].src_len, cells[i].src);
+                int index = cells[i].data_type - (int)EXPR_CSV_CELL_TYPE_STR;
+                const char *type = type_names[index];
+
+                printf(
+                        "%d: %d %s, %.*s\n",
+                        i + 1,
+                        index,
+                        type,
+                        cells[i].src_len,
+                        cells[i].src);
         }
 
         return 0;

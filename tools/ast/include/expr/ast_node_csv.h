@@ -24,6 +24,9 @@ enum expr_ast_node_csv_id {
         EX_AST_CSV_CELL_FLOAT3,
         EX_AST_CSV_CELL_FLOAT4,
         EX_AST_CSV_CELL_BOOL,
+        EX_AST_CSV_CELL_BOOL2,
+        EX_AST_CSV_CELL_BOOL3,
+        EX_AST_CSV_CELL_BOOL4,
 
         EX_AST_CSV_COUNT
 };

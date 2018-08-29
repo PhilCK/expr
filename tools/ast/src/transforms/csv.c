@@ -2,6 +2,7 @@
 #include <expr/ast.h>
 #include <expr/file.h>
 #include <expr/ast_node_csv.h>
+#include <expr/fundamental.h>
 #include <expr/v_array.h>
 #include <expr/lexer.h>
 #include <stdlib.h>
@@ -32,10 +33,37 @@ const char *expr_ast_node_csv_names[EX_AST_CSV_COUNT] = {
         "EX_AST_CSV_CELL_FLOAT3",
         "EX_AST_CSV_CELL_FLOAT4",
         "EX_AST_CSV_CELL_BOOL",
+        "EX_AST_CSV_CELL_BOOL2",
+        "EX_AST_CSV_CELL_BOOL3",
+        "EX_AST_CSV_CELL_BOOL4",
 };
 
 
 /* -------------------------------------------------------------- Helpers  -- */
+
+
+static int
+parse_bool(const char *src, int src_len) {
+        const char *bools[] = {
+                "true", "false",
+                "TRUE", "FALSE",
+                "True", "False",
+
+                "yes", "no",
+                "YES", "NO",
+                "Yes", "No",
+        };
+
+        unsigned i;
+
+        for(i = 0; i < EX_ARR_COUNT(bools); ++i) {
+                if(strncmp(bools[i], src, src_len) == 0) {
+                        return 1;
+                }
+        }
+
+        return 0;
+}
 
 
 static int
@@ -53,7 +81,15 @@ parse_cell(
 
         struct expr_token *ct = *t;
         int len = 0;
+
+        struct type_info {
+                int strs;
+                int ints;
+                int floats;
+                int bools;
+        } type_info = {0};
         
+
         while(ct->id != EX_TOKID_NULL) {
                 
                 /* check if its the delim */
@@ -68,6 +104,20 @@ parse_cell(
                 /* check if its a new line */
                 if(ct->sub_id == EX_TOKID_WS_NEWLINE) {
                         break;
+                }
+
+                /* check type info */
+                if(ct->sub_id == EX_TOKID_LIT_NUM) {
+                        type_info.ints += 1;
+                } else if(ct->sub_id == EX_TOKID_LIT_FLT) {
+                        type_info.floats += 1;
+                } else if(ct->id != EX_TOKID_WHITESPACE) {
+                        type_info.strs += 1;
+
+                        if(parse_bool(&src[ct->src_offset], ct->src_len)) {
+                                type_info.strs -= 1;
+                                type_info.bools += 1;
+                        }
                 }
 
                 len += ct->src_len;
@@ -96,10 +146,59 @@ parse_cell(
                 parent->l_param = curr_cell;
         }
 
+        /* cell type */
+        int cell_type = EX_AST_CSV_CELL_STR;
+
+        if(type_info.strs == 0) {
+                int has_bools = type_info.bools > 0;
+                int has_ints = type_info.ints > 0;
+                int has_floats = type_info.floats > 0;
+
+                if(has_bools && (!has_ints || !has_floats)) {
+                        int count = type_info.bools;
+
+                        if(count == 1) {
+                                cell_type = EX_AST_CSV_CELL_BOOL;
+                        } else if (count == 2) {
+                                cell_type = EX_AST_CSV_CELL_BOOL2;
+                        } else if (count == 3) {
+                                cell_type = EX_AST_CSV_CELL_BOOL3;
+                        } else if (count == 4) {
+                                cell_type = EX_AST_CSV_CELL_BOOL4;
+                        }
+                }
+                else if(has_ints && (!has_floats || !has_bools)) {
+                        int count = type_info.ints;
+
+                        if(count == 1) {
+                                cell_type = EX_AST_CSV_CELL_INT;
+                        } else if (count == 2) {
+                                cell_type = EX_AST_CSV_CELL_INT2;
+                        } else if (count == 3) {
+                                cell_type = EX_AST_CSV_CELL_INT3;
+                        } else if (count == 4) {
+                                cell_type = EX_AST_CSV_CELL_INT4;
+                        }
+                }
+                else if(has_floats && (!has_bools)) {
+                        int count = type_info.ints + type_info.floats;
+
+                        if(count == 1) {
+                                cell_type = EX_AST_CSV_CELL_FLOAT;
+                        } else if (count == 2) {
+                                cell_type = EX_AST_CSV_CELL_FLOAT2;
+                        } else if (count == 3) {
+                                cell_type = EX_AST_CSV_CELL_FLOAT3;
+                        } else if (count == 4) {
+                                cell_type = EX_AST_CSV_CELL_FLOAT4;
+                        }
+                }
+        }
+
         *last_cell = curr_cell;
 
         curr_cell->id         = EX_AST_CSV_CELL;
-        curr_cell->sub_id     = EX_AST_CSV_CELL_STR;
+        curr_cell->sub_id     = cell_type;
         curr_cell->parent     = parent;
         curr_cell->l_param    = 0;
         curr_cell->r_param    = 0;

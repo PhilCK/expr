@@ -21,7 +21,12 @@ enum expr_token_id {
         EX_TOKID_LIT_BIN,
         EX_TOKID_LIT_FLT,
         EX_TOKID_LIT_STR,
+
+        EX_TOKID_COUNT
 };
+
+
+extern const char *expr_tokid_names[EX_TOKID_COUNT];
 
 
 enum expr_lex_type_id {

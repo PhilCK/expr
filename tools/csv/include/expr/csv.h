@@ -24,6 +24,21 @@ enum expr_csv_identifiers {
         /* fetch selector */
         EXPR_CSV_FETCH_ROW,
         EXPR_CSV_FETCH_COLUMN,
+
+        /* cell data types */
+        EXPR_CSV_CELL_TYPE_STR,
+        EXPR_CSV_CELL_TYPE_INT,
+        EXPR_CSV_CELL_TYPE_INT2,
+        EXPR_CSV_CELL_TYPE_INT3,
+        EXPR_CSV_CELL_TYPE_INT4,
+        EXPR_CSV_CELL_TYPE_FLOAT,
+        EXPR_CSV_CELL_TYPE_FLOAT2,
+        EXPR_CSV_CELL_TYPE_FLOAT3,
+        EXPR_CSV_CELL_TYPE_FLOAT4,
+        EXPR_CSV_CELL_TYPE_BOOL,
+        EXPR_CSV_CELL_TYPE_BOOL2,
+        EXPR_CSV_CELL_TYPE_BOOL3,
+        EXPR_CSV_CELL_TYPE_BOOL4,
 };
 
 
@@ -100,6 +115,14 @@ expr_csv_check(
 /* ------------------------------------------------------------------ Data -- */
 
 
+/*
+ *  type_id should be EXPR_CSV_STRUCT_FETCH
+ *  ext unused
+ *  fetch_type a 'fetch selector' identifier
+ *  selection an integer representing the row or column to fetch
+ *  csv a valid struct expr_csv_data * object
+ *
+ */
 struct expr_csv_fetch_data_desc {
         int type_id;
         void *ext;
@@ -111,6 +134,11 @@ struct expr_csv_fetch_data_desc {
 };
 
 
+/*
+ *  date_type contains a 'cell data type' identifier
+ *  src the string of the data, not null term.
+ *  src_len the length of the string
+ */
 struct expr_csv_data_cell {
         int data_type;
         const char *src;
