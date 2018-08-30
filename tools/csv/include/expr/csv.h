@@ -91,21 +91,18 @@ struct expr_csv_check_desc {
 };
 
 
-enum expr_csv_integrity_flags {
-        EXPR_CSV_HAS_UNIFORM_COLUMN_TYPES = 1 << 0,
-        EXPR_CSV_HAS_UNIFORM_COLUMN_COUNT = 1 << 1,
-};
-
-
 struct expr_csv_integrity {
         int has_header_row;
-        int integrity;
-
-        int row_count;
-        int col_count;
+        int uniform_column_types;
+        int uniform_row_cell_count;
 };
 
 
+/* returns EXPR_CSV_INVALID_PARAM if desc or out_desc is null
+ * returns EXPR_CSV_INVALID_DESC if desc type id is not EXPR_CSV_STRUCT_CHECK
+ * returns EXPR_CSV_INVALID_DESC if desc csv is invalid
+ * returns EXPR_CSV_OK on success
+ */
 int
 expr_csv_check(
         struct expr_csv_check_desc *desc,

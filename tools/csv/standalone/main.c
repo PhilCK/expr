@@ -2,12 +2,19 @@
 #include <expr/csv.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
+
+/* ---------------------------------------------------------------- Config -- */
+
+
+#define DEBUG_PRINT 0
 
 
 /* ------------------------------------------------------ Application Vars -- */
 
 
-static const char *file = 0;
+const char *file = 0;
 int fetch_type = -1;
 int selector = -1;
 
@@ -31,12 +38,15 @@ process_args(int argc, const char **argv)
         int i;
 
         for (i = 1; i < argc; ++i) {
-                printf("arg %s\n", argv[i]);
+                if(DEBUG_PRINT) {
+                        printf("arg %s\n", argv[i]);
+                }
 
                 /* help */
                 if (strcmp(argv[i], "-help") == 0) {
                         print_help();
                 }
+                /* fetch */
                 else if (strcmp(argv[i], "-fetch") == 0) {
                         ++i;
 
@@ -68,6 +78,11 @@ process_args(int argc, const char **argv)
                 }
         }
 
+        /* do we have everything we need */
+        if((file == 0) || (fetch_type == -1) || (selector == -1)) {
+                return 0;
+        }
+
         return 1;
 }
 
@@ -83,14 +98,6 @@ main(int argc, const char **argv)
                 return 0;
         }
 
-        /*
-        #ifdef _WIN32
-        file = "C:/Users/SimStim/Developer/expr/tools/lexer/test_data/csv/no_header.csv";
-        #else
-        file = "/media/phil/Dev/dev-scratch/expr/tools/lexer/test_data/csv/no_header.csv";
-        #endif
-        */
-
         struct expr_csv_data *data = 0;
 
         int err = 0;
@@ -104,31 +111,21 @@ main(int argc, const char **argv)
         
         err = expr_csv_create(&import_desc, &data);
 
-        if(err != EXPR_CSV_OK) {
-                printf("Failed to import CSV\n");
-                return 0;
-        }
-        else {
-                printf("Loaded CSV\n");
-        }
-
-        /* check integrity */
-        /*
         struct expr_csv_check_desc integ_desc = {0};
         integ_desc.type_id = EXPR_CSV_STRUCT_CHECK;
         integ_desc.csv = data;
 
         struct expr_csv_integrity integ = {0};
 
-        success = expr_csv_check(&integ_desc, &integ);
+        err = expr_csv_check(&integ_desc, &integ);
 
-        if(!success) {
-                printf("CSV Failed to check integrity\n");
+        if(err != EXPR_CSV_OK) {
+                printf("CSV Failed to check integrity err: %d\n", err);
         }
 
-        if(!(integ.integrity & EXPR_CSV_HAS_UNIFORM_COLUMN_COUNT)) {
+        if(!integ.uniform_row_cell_count) {
                 printf("CSV Columns aren't consistant\n");
-        }*/
+        }
 
         /* get data */
         struct expr_csv_fetch_data_desc data_desc = {0};
@@ -144,7 +141,7 @@ main(int argc, const char **argv)
         if(err!= EXPR_CSV_OK) {
                 printf("Failed to get cell count\n");
                 return 0;
-        } else {
+        } else if (DEBUG_PRINT) {
                 printf("%d cell count\n", count);
         }
 

@@ -8,8 +8,11 @@
 #include <stdlib.h>
 
 
-#define DEBUG_PRINT_TOKENS 1
+/* ---------------------------------------------------------------- Config -- */
 
+
+#define DEBUG_PRINT_TOKENS 1 
+#define DEBUG_PRINT_AST 0
 
 
 /* -------------------------------------------------------------- Internal -- */
@@ -109,6 +112,12 @@ expr_csv_create(
                 return EXPR_CSV_FAIL;
         }
 
+        /* currently no print 
+        if(DEBUG_PRINT_AST) {
+                
+        }
+        */
+
         /* create data ctx */
         struct expr_csv_data *data = malloc(sizeof(*data));
 
@@ -141,6 +150,80 @@ expr_csv_destroy(
         }
 
         return EXPR_CSV_FAIL;
+}
+
+
+/* ------------------------------------------------------------- Integrity -- */
+
+
+int
+expr_csv_check(
+        struct expr_csv_check_desc *desc,
+        struct expr_csv_integrity *out_desc)
+{
+        int rowcell_count = 0;
+        struct expr_ast_node *ast = 0;
+        struct expr_ast_node *row = 0;
+        struct expr_ast_node *cell = 0;
+
+        assert(desc);
+        assert(desc->type_id == EXPR_CSV_STRUCT_CHECK);
+        assert(desc->csv);
+        assert(out_desc);
+
+        if(!desc || !out_desc) {
+                return EXPR_CSV_INVALID_PARAM;
+        }
+
+        if(desc->type_id != EXPR_CSV_STRUCT_CHECK || !desc->csv) {
+                return EXPR_CSV_INVALID_DESC;
+        }
+
+        ast = desc->csv->ast;
+
+        if(ast->id != EX_AST_CSV_DOC) {
+                assert(0);
+                return EXPR_CSV_FAIL;
+        }
+
+        row = ast->l_param;
+
+        if(!row) {
+                return EXPR_CSV_FAIL;
+        }
+
+        cell = row->l_param;
+
+        /* count cells of first row */
+        while(cell) {
+                rowcell_count += 1;
+                cell = cell->next;
+        }
+
+        /* check all rows have same count */
+        out_desc->uniform_row_cell_count = 1;
+        row = ast->l_param;
+        cell = 0;
+
+        while(row) {
+                cell = row->l_param;
+                int cell_count = 0;
+
+                while(cell) {
+                        cell_count += 1;
+                        cell = cell->next;
+                }
+
+                if(cell_count != rowcell_count) {
+                        printf("shhhh %d - %d\n", cell_count, rowcell_count);
+                        out_desc->uniform_row_cell_count = 0;
+                        break;
+                }
+
+                row = row->next;
+        }
+
+        return EXPR_CSV_OK;
 }
 
 
@@ -182,24 +265,6 @@ cell_from_ast(
 
 
 /* ------------------------------------------------------------------ Data -- */
-
-
-int
-expr_csv_check(
-        struct expr_csv_check_desc *desc,
-        struct expr_csv_integrity *out_desc)
-{
-        assert(desc);
-        assert(desc->type_id == EXPR_CSV_STRUCT_CHECK);
-        assert(desc->csv);
-        assert(out_desc);
-
-        if (!desc || desc->type_id != EXPR_CSV_STRUCT_CHECK || !desc->csv) {
-                return 0;
-        }
-
-        return 0;
-}
 
 
 int
@@ -314,3 +379,11 @@ expr_csv_fetch_data(
 
         return EXPR_CSV_OK;
 }
+
+
+/* ---------------------------------------------------------------- Config -- */
+
+
+#undef DEBUG_PRINT_TOKENS
+#undef DEBUG_PRINT_AST
+

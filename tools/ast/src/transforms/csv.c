@@ -227,13 +227,13 @@ parse_rows(
         int delim_len = strlen(delim);
 
         struct expr_ast_node *curr_row = 0;
+        ex_varr_push(root_node, curr_row);
         
         /* each row */
         while(ct->id != EX_TOKID_NULL) {
                 struct expr_ast_node *last_cell = 0;
 
-                ex_varr_push(root_node, curr_row);
-
+                
                 /*
                 printf("parse row %d %d %d - %.*s\n", ct->id, ct->src_len, ct->src_offset, ct->src_len, &src[ct->src_offset]);
                 */
@@ -263,6 +263,11 @@ parse_rows(
                                 break;
                         }
                 }
+
+                if(curr_row->l_param) {
+                        ex_varr_push(root_node, curr_row);
+                }
+
 
                 ct += 1;
         }
