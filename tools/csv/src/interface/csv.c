@@ -11,7 +11,7 @@
 /* ---------------------------------------------------------------- Config -- */
 
 
-#define DEBUG_PRINT_TOKENS 1 
+#define DEBUG_PRINT_TOKENS 0
 #define DEBUG_PRINT_AST 0
 
 
@@ -66,7 +66,7 @@ expr_csv_create(
                 }
                 
                 src = calloc(bytes, 1);
-                load = expr_file_load(desc->data, &src, 0);
+                load = expr_file_load(desc->data, (char*)src, 0);
 
                 if(!load) {
                         free((void*)src);
@@ -161,10 +161,10 @@ expr_csv_check(
         struct expr_csv_check_desc *desc,
         struct expr_csv_integrity *out_desc)
 {
-        int rowcell_count = 0;
         struct expr_ast_node *ast = 0;
         struct expr_ast_node *row = 0;
         struct expr_ast_node *cell = 0;
+        i = 0;
 
         assert(desc);
         assert(desc->type_id == EXPR_CSV_STRUCT_CHECK);
@@ -180,6 +180,9 @@ expr_csv_check(
         }
 
         ast = desc->csv->ast;
+         
+        out_desc->rows = 0;
+        out_desc->cols = 0;
 
         if(ast->id != EX_AST_CSV_DOC) {
                 assert(0);
@@ -196,7 +199,7 @@ expr_csv_check(
 
         /* count cells of first row */
         while(cell) {
-                rowcell_count += 1;
+                out_desc->cols += 1;
                 cell = cell->next;
         }
 
@@ -206,6 +209,8 @@ expr_csv_check(
         cell = 0;
 
         while(row) {
+                out_desc->rows += 1;
+
                 cell = row->l_param;
                 int cell_count = 0;
 
@@ -214,13 +219,26 @@ expr_csv_check(
                         cell = cell->next;
                 }
 
-                if(cell_count != rowcell_count) {
-                        printf("shhhh %d - %d\n", cell_count, rowcell_count);
+                if(cell_count != out_desc->cols) {
                         out_desc->uniform_row_cell_count = 0;
                         break;
                 }
 
                 row = row->next;
+        }
+
+        /* check column types */
+        cell = 0;
+
+        for (i = 0; i < out_desc->cols; ++i) {
+                row = ast->l_param;
+
+                /* look for column in this row */
+                while (row) {
+                        
+
+                        row = row->next;
+                }
         }
 
         return EXPR_CSV_OK;

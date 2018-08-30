@@ -91,10 +91,19 @@ struct expr_csv_check_desc {
 };
 
 
+/*
+ * has_header_row 1 if header row is different type to rest of the column
+ * uniform_column_types 1 if column has consistant types
+ * uniform_row_cell_count 1 if each row has same cell count
+ * rows contained in the csv
+ * cols contained in the csv
+ */
 struct expr_csv_integrity {
         int has_header_row;
         int uniform_column_types;
         int uniform_row_cell_count;
+        int rows;
+        int cols;
 };
 
 

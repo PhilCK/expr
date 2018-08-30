@@ -11,7 +11,7 @@
 int
 expr_file_load(
         const char *filename,
-        const char **memory,
+        char *memory,
         int *bytes);
 
 

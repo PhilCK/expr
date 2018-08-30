@@ -5,7 +5,7 @@
 int
 expr_file_load(
         const char *filename,
-        const char **memory,
+        char *memory,
         int *bytes)
 {
         long length = 0;
@@ -33,7 +33,9 @@ expr_file_load(
         }
 
         fseek(f, 0, SEEK_SET);
-        fread((void*)*memory, 1, length, f);
+        fread((void*)memory, 1, length, f);
+
+        memory[length] = '\0';
 
         fclose(f);
 
