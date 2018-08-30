@@ -8,25 +8,88 @@
 
 
 static const char *file = 0;
+int fetch_type = -1;
+int selector = -1;
 
 
 /* -------------------------------------------------------------- Cmd Args -- */
 
 
-/* todo */
+void
+print_help()
+{
+        printf("usage: ex-csv <csv_file> <options>\n\n");
+        printf("options:\n");
+        printf("-fetch <row|col> <selector>   returns the row or column\n");
+        printf("-help                         this screen\n");
+}
+
+
+int
+process_args(int argc, const char **argv)
+{
+        int i;
+
+        for (i = 1; i < argc; ++i) {
+                printf("arg %s\n", argv[i]);
+
+                /* help */
+                if (strcmp(argv[i], "-help") == 0) {
+                        print_help();
+                }
+                else if (strcmp(argv[i], "-fetch") == 0) {
+                        ++i;
+
+                        if (i > argc) {
+                                return 0;
+                        }
+
+                        if (strcmp(argv[i], "row") == 0) {
+                                fetch_type = EXPR_CSV_FETCH_ROW;
+                        }
+                        else if (strcmp(argv[i], "col") == 0) {
+                                fetch_type = EXPR_CSV_FETCH_COLUMN;
+                        }
+                        else {
+                                return 0;
+                        }
+
+                        ++i;
+
+                        if (i > argc) {
+                                return 0;
+                        }
+
+                        selector = atoi(argv[i]);
+                }
+                /* input file */
+                else {
+                        file = argv[i];
+                }
+        }
+
+        return 1;
+}
 
 
 /* ----------------------------------------------------------- Application -- */
 
 
 int
-main()
+main(int argc, const char **argv)
 {
+        if (!process_args(argc, argv)) {
+                printf("Unknown args\n");
+                return 0;
+        }
+
+        /*
         #ifdef _WIN32
         file = "C:/Users/SimStim/Developer/expr/tools/lexer/test_data/csv/no_header.csv";
         #else
         file = "/media/phil/Dev/dev-scratch/expr/tools/lexer/test_data/csv/no_header.csv";
         #endif
+        */
 
         struct expr_csv_data *data = 0;
 
@@ -70,8 +133,8 @@ main()
         /* get data */
         struct expr_csv_fetch_data_desc data_desc = {0};
         data_desc.type_id = EXPR_CSV_STRUCT_FETCH;
-        data_desc.fetch_type = EXPR_CSV_FETCH_COLUMN;
-        data_desc.selection = 4;
+        data_desc.fetch_type = fetch_type;
+        data_desc.selection = selector;
         data_desc.csv = data;
 
         int count = 0;
